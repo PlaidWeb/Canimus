@@ -8,7 +8,7 @@ Music discovery, consumption, and streaming is locked down by large corporations
 
 There are several disparate attempts to build a better world for musicians, but many of them are built on protocols that were not designed for this use case in mind. ActivityPub and RSS were simply not designed with the specific needs of distribution and discovery of musical content, and most of the existing attempts are built on top of those.
 
-Canimus (Latin for "We Sing") is an attempt to build a lightweight syndication protocol that anyone can join in on, and which provides the much-needed structure for subscribing to musicians' streaming content while also providing the information necessary to provide fair support for musicians, while also being Web-native.
+Canimus (Latin for "We Sing") is an attempt to build a lightweight syndication protocol that anyone can join in on, and which provides the much-needed structure for subscribing to musicians' streaming content in a way that enables fair payments, while also being Web-native.
 
 ## Scope
 
@@ -291,15 +291,17 @@ Listeners should be able to publicly provide a profile of the music they are lis
 
 This information can be used to build a per-player recommendation database, and possibly allow listeners to subscribe to each other as a form of peer-to-peer discovery and recommendation.
 
+The most logical means of formatting the feed is as a Canimus feed with a `scrobble` entity (which would in turn build on `playlist`), but it could also be provided in other formats for compatibility with other services (Libre.fm, ListenBrainz, etc.)
+
 ### Payments
 
 It is up to the player to collect information about which listeners have listened to which artists and send out payments accordingly.
 
 One possible mechanism for this would be for the player to track a running "support balance" for each listener and artist, and periodically check to see which artists have reached a particular payment threshold and then encourage the listener to make a payment at a fair rate.
 
-[TODO: rewrite this horrible mess for clarity!]
+[TODO: rewrite this horrible mess for clarity! Maybe make an example ledger sheet or something]
 
-For one example of how this could work, every artist and listener can maintain a running balance throughout the month. Every unit of time spent listening will transfer some rate from the listener's balance to the artist's. At the end of the month, any artist whose balance exceeds a certain threshold will get that amount paid directly (zeroing out their balance), and what's left over could be divvied up among the top-performing artists such that those payments exceed the threshold but then give those artists a negative balance.
+For one example of how this could work, every artist and listener can maintain a running balance throughout the month. Every unit of time spent listening will transfer some rate from the listener's balance to the artist's, at a fair rate to be determined by the listener; for example, a listener who typically listens to 100 hours of music a month and thinks that's worth $10 could set their payment rate to 10¢/hour. At the end of the month, any artist whose balance exceeds a certain threshold will get that amount paid directly (zeroing out their balance), and what's left over could be divvied up among the top-performing artists such that those payments exceed the threshold but then give those artists a negative balance.
 
 For example, if the payment threshold is $5, and there's $12 left in the pot after all artists who earned more than $5 are paid, then the artists with the two highest remaining balances each receive $6, and their balances then go negative for the next round.
 
