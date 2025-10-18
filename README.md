@@ -8,7 +8,7 @@ Music discovery, consumption, and streaming is locked down by large corporations
 
 There are several disparate attempts to build a better world for musicians, but many of them are built on protocols that were not designed for this use case in mind. ActivityPub and RSS were simply not designed with the specific needs of distribution and discovery of musical content, and most of the existing attempts are built on top of those.
 
-Canimus (Laton for "We Sing") is an attempt to build a lightweight syndication protocol that anyone can join in on, and which provides the much-needed structure for subscribing to musicians' streaming content while also providing the information necessary to provide fair support for musicians, while also being Web-native.
+Canimus (Latin for "We Sing") is an attempt to build a lightweight syndication protocol that anyone can join in on, and which provides the much-needed structure for subscribing to musicians' streaming content while also providing the information necessary to provide fair support for musicians, while also being Web-native.
 
 ## Scope
 
@@ -16,26 +16,9 @@ This document is meant to explain the publishing mechanism for music providers (
 
 As an informal document is it meant only to be descriptive and aspirational. As systems grow and develop it will almost certainly be the case that some aspects of this need to be modified or expanded upon, and at a certain point it will need to be formalized into a standard.
 
-
-## Discovery and retrieval
-
-
-
-### Feed discovery
-
-* define HTML `<link rel>` and HTTP `Link:` headers for feed discovery
-
-### Expected retrieval mechanism
-
-* to be retrieved by a dumb HTTP client (i.e. no javascript)
-* allowance for authentication for the purpose of private collections
-* discuss use of last-modified/etags
-* note that feeds are *additive*, with deletions being an extra verb to be expressed
-* note that it is up to the subscriber to handle content that goes missing, e.g. listing it as "currently unavailable" and only hiding/deleting it after a certain time period of continued missing data
-
 ## Feed standard
 
-A feed is formatted as structured data, provided in a commonly-parseable format that provides nested key-value pairs and arrays of data.
+A feed is formatted as structured data, provided in a commonly-parseable format that provides nested key-value pairs and arrays of data. Every hierarchical layer represents a single entity, which may contain other entities.
 
 From an implementation standpoint, JSON is likely the simplest to implement and to build validation tools for. However, there can be a case for using an alternate format such as HTML+mf2, which allows the same data to be both human-readable and embed semantics in the form of microformats.
 
@@ -49,63 +32,226 @@ For the sake of this document, the assumption will be that the feed is written i
 
 in the HTML `<head>`, with the usual provisions for alternate discovery via `Link:` HTTP response headers.
 
-Every layer is hierarchical, and can contain any number of any other layer beneath it. Any attributes which can inherit from a higher layer should do so, as a fallback.
+### Entity definitions
 
-### Common vocabulary
+These are the entities which can be defined by the feed.
 
-These are the attributes that make sense at any level in the hierarchy. They inherit unless stated otherwise.
+The following attributes apply to all types of entity:
 
-* `url`: The canonical URL for an HTML representation of the content, e.g. the webpage for the label/artist/album/track
+* `type`: The type of entity being defined
+* `name`: The common name of the entity
+* `url`: The canonical URL for an HTML representation of the current entity, e.g. the webpage for the label/artist/album/track
+* `uid`: An opaque, permanent string identifier to uniquely identify this entity; optional but recommended, and defaults to `url` if not specified
+
 * `images`: A collection of images that are relevant to the display of the content, including:
 
     * `icon`: A small icon to represent the item
     * `artwork`: Primary artwork to be displayed in a player (primarily relevant to an album or track, but can also be used as a band fallback for things without artwork, for example)
     * `photo`: A larger photographic image representing the item (headshots, profile images, etc.)
 
-    Each of these can be provided as a simple URL, or as a set of properties including URL, alt-text, different renditions/resolutions/formats for different viewport sizes (similar to the HTML `<picture>` element), and so on. Additional image types can also be provided for e.g. liner art, alternate covers, and so on.
+    Each of these keys maps to a dictionary of properties, including:
 
-* `mbid`: The associated [MusicBrainz identifier](https://musicbrainz.org/doc/MusicBrainz_Identifier), if available; this attribute does not inherit
+    * `alt`: The accessibility alt-text of the image
+    * `media`: A list of media for the image, each a dictionary with properties including:
+        * `src`: The URL to access the image
+        * `width` and `height`: The pixel dimensions of the image
+        * `type`: The MIME content type of the image (e.g. `image/png`, `image/jpeg`)
+
+* `summary`: A short description of the entity, intended to be one single line of plain text.
+* `description`: A longer description of the entity, formatted as HTML, to be sanitized by the consumer.
+
+* `mbid`: The associated [MusicBrainz identifier](https://musicbrainz.org/doc/MusicBrainz_Identifier), if available and applicable
 * `links`: Associated links, including:
-    * `support`: How to support this entity financially
-    * `purchase`: Where to purchase a copy of this entity, ideally given as a key-value dictionary mapping the service name to the URL
+    * `related`: Related links for the entity itself; for example:
 
+        * `me`: An alternate URL that is also trusted to represent this entity
+        * `canonical`: The URL that is considered the canonical representation of this entity on the web
 
-### Collection
+    * `support`: How to support this entity financially, given as a key-value dictionary mapping the service name (e.g. `ko-fi`, `patreon`, etc.) to the URL
+    * `purchase`: Where to purchase a copy of this entity, given as a key-value dictionary mapping the service name (e.g. `bandcamp`, `mirlo`, etc.) to the URL
+    * `websites`: A list of key-value pairs for related websites for this entity, given as a list of `label`, `url`, and optional `type`, e.g.:
 
-### Artist
+        ```json
+        [{
+            "label": "homepage",
+            "url": "https://bandpage.example.com/"
+        },
+        {
+            "label": "blog",
+            "url": "https://bandpage.example.com/blog"
+        },
+        {
+            "label": "feed",
+            "url": "https://bandpage.example.com/feed",
+            "type": "application/atom+xml"
+        },
+        {
+            "label": "calendar",
+            "url": "https://bandpage.example.com/live/calendar"
+        },
+        {
+            "label": "fediverse",
+            "url": "https://fedi.example.com/@exampleband"
+        }]
+        ```
 
-### Album
+* `children`: A list of entities that are contained by this entity.
 
-### Disc/side
+#### Top level
 
-### Track
+The top-level entity does not have a `type` and refers to the feed itself.
 
-* allow for multiple content-types (`audio/mp3`, `audio/ogg-vorbis`, etc.)
+It provides the following additional `related` links (all optional):
+
+* `hub`, which links to a [WebSub](https://en.wikipedia.org/wiki/WebSub) hub, where a consumer can subscribe to immediate updates to this feed
+* Pagination links, as described in the "Pagination" section below
+
+#### Collection
+
+An entity of type `collection` is a generic grouping that can contain any number of any other entities. It has the following additional attributes:
+
+* `collection-type`: What type of collection it is; possible values would include `library`, `label`, `distributor`, and so on
+
+#### Artist
+
+An entity of type `artist` is a performing artist. The `name` attribute refers to the primary name under which the artist releases.
+
+#### Album
+
+An entity of type `album` is a collection of songs. The `name` attribute refers to the title of the album. It contains the following additional properties:
+
+* `artist`: The releasing artist of this album (also known as "album artist"). It defaults to the name of the containing `artist`. If no such name is specified, it is up to the consumer how to display the album-level attribution.
+* `subtitle`: The subtitle of the album
+* `copyright`: The copyright information of the album
+* `license`: Any additional license information, e.g. `"CC by-nc-sa"`
+
+#### Track
+
+An entity of type `track` refers to a playable track. If it is contained by an `album`, then it is given a playback order based on its position in the album's `children`; otherwise it is assumed to be a single.
+
+It has the following additional properties:
+
+* `title`: The title of this track
+* `subtitle`: The subtitle of the track, if any
+* `artist`: The releasing artist of this track, which may differ from the album artist
+* `album`: The name of the album on which this track appears, if any; this is normally implied by the containing `album`, and in the case of a single release, may be blank
+* `composer`: The composer of the track
+* `original-artist`: The original performing artist, if this song is a cover
+* `duration`: The canonical length of the track, in seconds
+* `media`: A set of descriptors for to streamable versions of the audio. This *should* at the very least contain an `audio/mp3` version for maximum compatibility, but may also contain other versions. Each descriptor contains the following properties:
+
+    * `type`: The content-type of the media (e.g. `audio/mp3`, `audio/flac`, `video/mp4`, `application/x-mpegURL`, etc.) (required)
+    * `src`: The URL at which the media can be played (required)
+    * `size`: The size of the content file, in bytes (optional but recommended)
+    * `duration`: The duration of the media, in seconds, if it differs from the canonical length (optional but recommended)
+
+    There can be multiple media with the same type, differentiated by `size` to indicate different quality levels/bitrates, so that player applications can choose the appropriate quality level based on bandwidth availability.
+
+* `disc`: The physical disc that the track appeared on, in the case of a multi-disc album
+* `track`: The physical track number for the track on its disc
+
+* `copyright`: The copyright information of the album (defaults to the album's if unspecified)
+* `license`: Any additional license information, e.g. `"CC by-nc-sa"` (defaults to the album's if unspecified)
+
+* `lyrics`: The lyrics of the song, if any; this should be provided as plain text with a single `\n` between lines, and `\n\n` between verses. Limited Markdown (such as `*emphasis*` and `**boldface**`) may be supported at the discretion of the consumer.
+
+Note that `disc` and `tracknum` are purely for display purposes, and do not affect the natural playback order of the track
+
+An example track might look like:
+
+```json
+{
+    "type": "track",
+    "artist": "The Example Band",
+    "name": "Introduction",
+    "subtitle": "Radio Edit",
+    "uid": "13a93b29-4e4b-4967-a077-cbe8491767ec",
+    "url": "https://example.com/band/releases/introduction.html",
+    "duration": 45,
+    "disc": 1,
+    "track": 1,
+    "media": [{
+        "type": "audio/mp3",
+        "src": "https://cdn.example.com/artist/album/01 the introductory track.mp3",
+        "size": 737280
+    }, {
+        "type": "audio/mp3",
+        "src": "https://cdn.example.com/artist/album/01 the introductory track.mp3",
+        "size": 1843200,
+        "comment": "high-quality version"
+    }, {
+        "type": "video/mp4",
+        "src": "https://cdn.example.com/artist/videos/the introductory track.mp4",
+        "duration": 120,
+        "size": 384198472,
+        "comment": "music video"
+    }]
+}
+```
 
 ### Playlist
 
+A curated list of music to listen to, including tracks and albums. This can be useful for an artist to publish a "best of" or a mixtape or the like. It has the following additional properties:
+
+* `author`: The author of the playlist
+
+The `children` of the playlist must contain complete copies of the metadata for the elements being represented, including any implied attributes such as `artist` and `album`. For example:
+
+```json
+{
+    "type": "playlist",
+    "author": "Example Curator",
+    "chilren": [{
+        "type": "track",
+        "artist": "Example Band",
+        "name": "Hit Single",
+        "subtitle": "So tired",
+        "duration": 120,
+        "album": "Self-Titled Album",
+        "url": "https://example.com/band/releases/hit-single.html",
+        "media": [{
+            "type": "audio/mp3",
+            "src": "https://cdn.example.com/artist/album/07 hit single.mp3",
+            "size": 2949120
+        }],
+        "disc": 1,
+        "track": 3,
+        "uid": "efd71467-3b9c-483c-a081-175f6a6f1a74"
+    }, {
+        "type": "track",
+        "artist": "Another band",
+        "name": "A bigger fish to fry",
+        "url": "https://example.com/other-band/fish.html",
+        "media": [{
+            "type": "audio/mp3",
+            "src": "https://cdn.example.com/other-band/fish.mp3",
+            "size": 2949120
+        }],
+        "uid": "1120a795-e51b-4666-b8f5-1904dd8b568f"
+    }]
+}
+```
+
+As with `album`, the position in the `children` list is what indicates the natural playback order of the song within the playlist; `track` and `disc` are used only for display purposes.
+
 ### Deletion
 
-### Related links
+At the top level of the feed, there is an optional attribute, `delete`, which is a list of the unique identifiers of the content that has been removed. These deletion identifiers should use the `uid` property, or the original `url` if the `uid` was not used. The original item should no longer appear anywhere else in the feed or its paginated views.
 
-#### Pagination
+Consumers of this property should take care to ensure that *only* items which were originally provided by this feed are able to be deleted by it (to avoid malicious removal requests coming from other feeds).
 
+### Pagination
 
+Many feeds will be much too large for all data to be provided in a single view, and so there must be a means of breaking the feed up into chunks that can be incrementally retrieved. In order to facilitate this, the feed's `related` links may contain the following link types:
 
-todo:
+* `self`: The canonical URL to this specific page, if this is an archival page
+* `current`: The URL to the current/most recent page of the feed (typically the main URL to the feed itself)
+* `next`: The next page of the feed, in the event that we are paginating
+* `previous`: The previous page of the feed, in the event that we are paginating
 
-* hierarchal definition
-* attribute vocabulary
-* collection (top-level)
-* artist
-* album
-* track
-* playlists
-* deletions/revocations
-* pagination/linked data
-* related links (artist page, websub, etc.)
-* canonical URLs vs UIDs
-* MusicBrainz IDs
+Any changes which occur to elements which appeared on prior pages *MUST* appear on the page that is current at the time that the change took place. For example, if a piece of music that was published in January of 2020 was deleted in June of 2025, it's the page reflecting June 2025 that would contain the deletion. Similarly, updates to song metadata would occur in the feed at the time that the update happened. In this way, feed consumers do not need to re-traverse the entire backlog of a large feed to get all updates, and can incrementally update only by retrieving the current feed and any pages that haven't already been retrieved.
+
+For this reason, past page URLs must also be stable; if the June 2025 page has a URL of e.g. `https://example.com/feed/2025-06.json`, then it must *always* be at that URL. In this way, a consumer can stop traversing a feed once it has encountered an archival feed URL that it has already processed.
 
 ## Player considerations
 
@@ -113,9 +259,11 @@ For the purpose of this document, "player" refers to the sum total of the player
 
 ### Subscriptions
 
-Generally-speaking, the player should periodically refresh the feeds that it has knowledge of, as well as using a protocol such as [WebSub](https://en.wikipedia.org/wiki/WebSub) for immediate "pings" for when an update should take place.
+Generally-speaking, the player should periodically refresh the feeds that it has knowledge of at some regular interval, as well as supporting [WebSub](https://en.wikipedia.org/wiki/WebSub) for immediate "pings" when an update takes place.
 
 If a feed or its content disappears in some way other than being explicitly deleted, it should be up to the player to handle this in a graceful manner. For example, content which has just gone offline should be listed as "temporarily unavailable," and then after a certain period of unavailability it could be removed.
+
+The current page of the feed should always be fully processed. Any archival URLs should be retrieved if they were not already processed. This includes both `next` and `previous`.
 
 ### Collisions
 
