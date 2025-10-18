@@ -293,3 +293,16 @@ This information can be used to build a per-player recommendation database, and 
 
 ### Payments
 
+It is up to the player to collect information about which listeners have listened to which artists and send out payments accordingly.
+
+One possible mechanism for this would be for the player to track a running "support balance" for each listener and artist, and periodically check to see which artists have reached a particular payment threshold and then encourage the listener to make a payment at a fair rate.
+
+[TODO: rewrite this horrible mess for clarity!]
+
+For one example of how this could work, every artist and listener can maintain a running balance throughout the month. Every unit of time spent listening will transfer some rate from the listener's balance to the artist's. At the end of the month, any artist whose balance exceeds a certain threshold will get that amount paid directly (zeroing out their balance), and what's left over could be divvied up among the top-performing artists such that those payments exceed the threshold but then give those artists a negative balance.
+
+For example, if the payment threshold is $5, and there's $12 left in the pot after all artists who earned more than $5 are paid, then the artists with the two highest remaining balances each receive $6, and their balances then go negative for the next round.
+
+In this way, even artists who don't get a lot of listening would end up randomly getting at least some amount of money in a means similar to [Floyd-Steinberg dithering](https://en.wikipedia.org/wiki/Floyd%E2%80%93Steinberg_dithering), and it will average out in the long run.
+
+Content streamed from private libraries would not necessarily be subject to the balance accrual, or the balance for the library itself could be refunded back to the listener, possibly with statistics about which bands they listened to most from their library (so that it can be left up to the listener's discretion as to whether to send additional support to the artist they ***most definitely*** bought the music from already).
