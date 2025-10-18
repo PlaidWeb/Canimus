@@ -10,6 +10,8 @@ There are several disparate attempts to build a better world for musicians, but 
 
 Canimus (Latin for "We Sing") is an attempt to build a lightweight syndication protocol that anyone can join in on, and which provides the much-needed structure for subscribing to musicians' streaming content in a way that enables fair payments, while also being Web-native.
 
+This is an expansion on the ideas stated in "[A fair independent streaming platform](https://beesbuzz.biz/blog/11155-A-fair-independent-streaming-platform)."
+
 ## Scope
 
 This document is meant to explain the publishing mechanism for music providers (i.e. musicians and record labels) to provide their works to syndication, and some of the mechanisms through which the consumers (i.e. radio stations and streaming players) might use this feed in order to make use of this data. It is not intended to be a fully complete implementation guide, nor does it place any specific usage patterns on the exposed data beyond suggestions of how it might be used.
