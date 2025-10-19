@@ -6,7 +6,7 @@ Canimus is the Latin first-person plural progressive form of [canō](https://en.
 
 * We sing
 * We play
-* We make sound sound
+* We make sound
 * We chant
 * We resound
 * We prophesize
