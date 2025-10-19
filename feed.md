@@ -104,6 +104,7 @@ An entity of type `album` is a collection of songs. The `name` attribute refers 
 * `subtitle`: The subtitle of the album
 * `copyright`: The copyright information of the album
 * `license`: Any additional license information, e.g. `"CC by-nc-sa"`
+* `genre`: An arbitrary string of text that may indicate vaguely what sorts of people might like the music on this album
 
 ## Track
 
@@ -134,6 +135,7 @@ It has the following additional properties:
 * `license`: Any additional license information, e.g. `"CC by-nc-sa"` (defaults to the containing `album`'s if unspecified)
 
 * `lyrics`: The lyrics of the song, if any; this should be provided as plain text with a single `\n` between lines, and `\n\n` between verses. Limited Markdown (such as `*emphasis*` and `**boldface**`) may be supported at the discretion of the consumer.
+* `genre`: An arbitrary string of text that may indicate vaguely what sorts of people might like this track (defaults to the containing `album`'s if unspecified)
 
 Note that `disc` and `track` are purely for display purposes, and do not affect the natural playback order of the track, which is given by the order of the `track` elements within the containing entity's `children`.
 
