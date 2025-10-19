@@ -57,6 +57,7 @@ The following attributes apply to all types of entity:
         * `support`: Indicates that this URL is where a listener may provide financial support to the artist
         * `purchase`: Indicates that this URL is where a listener may obtain a copy of this content
         * `video`: A place to see a music video for this content
+        * `icon`: A small image to represent the link, formatted the same way as it would be in `images`
 
 * `children`: A list of entities that are contained by this entity.
 
