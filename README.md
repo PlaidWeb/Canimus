@@ -124,6 +124,7 @@ An entity of type `album` is a collection of songs. The `name` attribute refers 
 
 * `artist`: The releasing artist of this album (also known as "album artist"). It defaults to the name of the containing `artist`. If no such name is specified, it is up to the consumer how to display the album-level attribution.
 * `subtitle`: The subtitle of the album
+* `genre`: A human-readable plaintext arbitrary description of what sort of music they think the listener may identify it as
 * `copyright`: The copyright information of the album
 * `license`: Any additional license information, e.g. `"CC by-nc-sa"`
 
@@ -135,6 +136,7 @@ It has the following additional properties:
 
 * `title`: The title of this track
 * `subtitle`: The subtitle of the track, if any
+* `genre`: Optionally overrides the album `genre`
 * `artist`: The releasing artist of this track, which may differ from the album artist
 * `album`: The name of the album on which this track appears, if any; this is normally implied by the containing `album`, and in the case of a single release, may be blank
 * `composer`: The composer of the track
@@ -169,6 +171,7 @@ An example track might look like:
     "subtitle": "Radio Edit",
     "uid": "13a93b29-4e4b-4967-a077-cbe8491767ec",
     "url": "https://example.com/band/releases/introduction.html",
+    "genre": "avant-industrial loungecore",
     "duration": 45,
     "disc": 1,
     "track": 1,
@@ -203,7 +206,7 @@ The `children` of the playlist must contain complete copies of the metadata for 
 {
     "type": "playlist",
     "author": "Example Curator",
-    "chilren": [{
+    "children": [{
         "type": "track",
         "artist": "Example Band",
         "name": "Hit Single",
@@ -224,6 +227,7 @@ The `children` of the playlist must contain complete copies of the metadata for 
         "artist": "Another band",
         "name": "A bigger fish to fry",
         "url": "https://example.com/other-band/fish.html",
+        "genre": "industrial country-funk",
         "media": [{
             "type": "audio/mp3",
             "src": "https://cdn.example.com/other-band/fish.mp3",
