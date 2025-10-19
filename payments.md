@@ -19,3 +19,7 @@ As a variant on the "support ledger" strategy, there could be a monthly collecti
 Anything left over would be split up among the artists with the top balances that fall below the threshold; for example, if the threshold is $5 and the coffer has $127 in it, then the top 25 unpaid artists would then receive $5.08, and their balances would be decreased by that amount (going negative, as an advance on future payment thresholds).
 
 This strategy could also be used to allow for things like community support or ad revenue or the like to offset the costs of people who are unable or unwilling to pay.
+
+## Implementation notes
+
+The recorded duration should be based on actual play time instead of the reported duration in the feed; this is to avoid things like feeds overreporting the length of the track, and allowing people to game the system by repeatedly listening to just a few seconds of a track. This also allows for prorating based on partial listens.
