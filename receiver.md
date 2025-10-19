@@ -14,7 +14,7 @@ The current page of the feed should always be fully processed. Any archival URLs
 
 In order to prevent things like malicious takeovers of band names, as well as the very common case of multiple bands having the same name, artists should be namespaced to the URL of the feed that populates the data.
 
-Multiple feeds may represent the same entities, which can be verified by both sources providing links with a `rel` of `me` which indicate this endorsement; for example, if feed A and feed B refer to each other with such a link, it can be assumed that their content may be merged. Additionally, any `rel` of `canonical` should be used to indicate which one "wins" in the case of conflicts, or should be used as the source of ground truth.
+Multiple feeds may represent the same entities, which can be verified by both sources providing links with a `rel` of `this` which indicate this endorsement; for example, if feed A and feed B refer to each other with such a link, it can be assumed that their content may be merged. Additionally, any `rel` of `canonical` should be used to indicate which one "wins" in the case of conflicts, or should be used as the source of ground truth.
 
 ## Private libraries
 

@@ -52,7 +52,7 @@ The following attributes apply to all types of entity:
     * `href`: The target of the link; **required**
     * `type`: The content-type of the link
     * `rel`: The relation of this link, for example:
-        * `me`: An alternate URL that is also trusted to represent this entity
+        * `this`: An alternate URL that is also trusted to represent this entity
         * `canonical`: The URL that is considered the canonical representation of this entity on the web
         * `support`: Indicates that this URL is where a listener may provide financial support to the artist
         * `purchase`: Indicates that this URL is where a listener may obtain a copy of this content
