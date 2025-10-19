@@ -2,7 +2,7 @@
 
 A feed is formatted as structured data, provided in a commonly-parseable format that provides nested key-value pairs and arrays of data. Every hierarchical layer represents a single entity, which may contain other entities.
 
-From an implementation standpoint, JSON is likely the simplest to implement and to build validation tools for. However, there can be a case for using an alternate format such as HTML+mf2, which allows the same data to be both human-readable and embed semantics in the form of microformats.
+From an implementation standpoint, JSON is likely the simplest to implement and to build validation tools for. However, there can be a case for using an alternate format such as HTML+mf2, which allows the same data to be both human-readable and embed semantics in the form of microformats. However, a standalone feed is generally preferred, as this lends itself well to less ambiguous parsing, and allows the feed to be served up as an API endpoint for the many existing publishing/distribution systems that are implemented in the form of single-page applications, rather than static or server-side-rendered websites.
 
 Other formats such as XML and YAML are also plausible.
 
