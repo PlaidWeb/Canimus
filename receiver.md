@@ -28,7 +28,7 @@ A good starting point header value, for clients which only can parse the JSON fe
 
 If you can also parse YAML, then you would do:
 
-    Accept: application/canimus+json,application/json,application/yaml;q=0.9, */*;q=0.5
+    Accept: application/canimus+json, application/json, application/yaml, */*;q=0.5
 
 And so on.
 
@@ -48,7 +48,7 @@ Here is Python stub code for how to implement all of the above, using [requests]
 def update_feed(feed_url, last_response_headers):
     headers = {
         'User-Agent': 'ExamplePlayer/1.2; +https://example.com/player/about.html',
-        'Accept': 'application/canimus+json,application/json;q=0.9, */*;q=0.5'
+        'Accept': 'application/canimus+json, application/json;q=0.9, */*;q=0.5'
     }
     if last_response_headers and 'ETag' in last_response_headers:
         headers['If-None-Match'] = last_response_headers['ETag']
@@ -70,7 +70,7 @@ async function updateFeed(feedUrl, lastResponseHeaders) {
     const request = await fetch(feedUrl, {
         headers: {
             'User-Agent': 'ExamplePlayer/1.2; +https://example.com/player/about.html',
-            'Accept': 'application/canimus+json,application/json;q=0.9, */*;q=0.5'
+            'Accept': 'application/canimus+json, application/json;q=0.9, */*;q=0.5'
             'If-None-Match': lastResponseHeaders['Last-Modified'],
             'If-Modified-Since': lastResponseHeaders['ETag']
         }
