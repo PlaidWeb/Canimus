@@ -25,7 +25,12 @@ The following attributes apply to all types of entity:
 * `type`: The type of entity being defined; **required**
 * `name`: The common name of the entity
 * `url`: The canonical URL for an HTML representation of the current entity, e.g. the webpage for the label/artist/album/track
-* `uid`: An opaque, permanent string identifier to uniquely identify this entity; this defaults to `url` if not specified. At least one of `url` or `uid` is **required**
+* `uid`: An opaque, permanent string identifier to uniquely identify this entity relative to this feed; this defaults to `url` if not specified
+
+    At least one of `url` or `uid` is **required**
+
+* `release-date`: The original release date, in `YYYY-MM-DD` format; **strongly recommended**
+* `updated-date`: The date of the last update, in `YYYY-MM-DD` format
 
 * `images`: A collection of images that are relevant to the display of the content. This is to be stored as a key-value dictionary, where the key is the type of image, and the value describes the image.
 
@@ -79,9 +84,10 @@ A feed supports the following additional link types, with the `rel` value set ac
 Many feeds will be much too large for all data to be provided in a single view, and so there must be a means of breaking the feed up into chunks that can be incrementally retrieved. In order to facilitate this, the feed's `related` links may contain the following link types:
 
 * `self`: The canonical URL to this specific page, if this is an archival page
-* `current`: The URL to the current/most recent page of the feed (typically the main URL to the feed itself)
+* `current`: The URL to the current/most recent page of the feed (typically the main URL to the feed itself); **required** if this is not the current page
 * `next`: The next page of the feed, in the event that we are paginating
 * `previous`: The previous page of the feed, in the event that we are paginating
+* `all`: A link to a feed that contains the full content of the collection, if that's feasible/reasonable
 
 Any changes which occur to elements which appeared on prior pages *MUST* appear on the page that is current at the time that the change took place. For example, if a piece of music that was published in January of 2020 was deleted in June of 2025, it's the page reflecting June 2025 that would contain the deletion. Similarly, updates to song metadata would occur in the feed at the time that the update happened. In this way, feed consumers do not need to re-traverse the entire backlog of a large feed to get all updates, and can incrementally update only by retrieving the current feed and any pages that haven't already been retrieved.
 
