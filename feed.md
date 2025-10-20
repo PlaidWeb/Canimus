@@ -32,6 +32,8 @@ The following attributes apply to all types of entity:
 * `release-date`: The original release date, in `YYYY-MM-DD` format; **strongly recommended**
 * `updated-date`: The date of the last update, in `YYYY-MM-DD` format
 
+    For both of these, partial dates are acceptable in the event that only the year or year and month are available.
+
 * `images`: A collection of images that are relevant to the display of the content. This is to be stored as a key-value dictionary, where the key is the type of image, and the value describes the image.
 
     Possible keys include (but are not limited to):
