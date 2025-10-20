@@ -10,6 +10,82 @@ If a feed or its content disappears in some way other than being explicitly dele
 
 The current page of the feed should always be fully processed. Any archival URLs should be retrieved if they were not already processed. This includes both `next` and `previous`.
 
+### [`User-Agent`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/User-Agent)
+
+It's a good idea to declare an appropriate `User-Agent` header that follows the [accepted practices for crawlers and bots](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/User-Agent#crawler_and_bot_ua_strings); namely, you should declare your `User-Agent` to be something like:
+
+    ExamplePlayer/1.2; +https://example.com/player/about.html
+
+This allows site operators to know more about your player application and to be able to contact you in the event that something's going wrong with your update mechanism.
+
+### [`Accept`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Accept)
+
+The HTTP `Accept` header declares which feed protocols you accept and prefer, and it's always a very good idea to declare it for the best match between client and server.
+
+A good starting point header value, for clients which only can parse the JSON feed format, might be:
+
+    Accept: application/canimus+json,application/json;q=0.9, */*;q=0.5
+
+If you can also parse YAML, then you would do:
+
+    Accept: application/canimus+json,application/json,application/yaml;q=0.9, */*;q=0.5
+
+And so on.
+
+This allows the server to select the appropriate protocol to send back, in the event that it supports multiple protocols. Notably, this also allows implementations to provide a human-readable HTML fallback if no particular content-type is requested, which is a better user experience in general.
+
+### Caching and avoiding over-updating
+
+Like with any client that polls for updates, the receiver should support the standard HTTP [`If-Modified-Since`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Modified-Since) and [`If-None-Match`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-None-Match) mechanisms to ensure that it is only downloading the feed if something has changed.
+
+The short version: Any time you poll the feed, keep track of the values of the `ETag` and `Last-Modified` response headers, and if you have them, add them to the request's `If-None-Match` and `If-Modified-Since` headers, respectively, and if you get a status code of 304, the feed hasn't updated since the last poll.
+
+### Reference implementations
+
+Here is Python stub code for how to implement all of the above, using [requests](https://requests.readthedocs.io/):
+
+```python
+def update_feed(feed_url, last_response_headers):
+    headers = {
+        'User-Agent': 'ExamplePlayer/1.2; +https://example.com/player/about.html',
+        'Accept': 'application/canimus+json,application/json;q=0.9, */*;q=0.5'
+    }
+    if last_response_headers and 'ETag' in last_response_headers:
+        headers['If-None-Match'] = last_response_headers['ETag']
+    if last_response_headers 'Last-Modified' in last_response_headers:
+        headers['If-Modified-Since'] = last_response_headers['Last-Modified']
+
+    r = requests.get(feed_url, headers=headers)
+
+    if r.status == 304: # Not Modified
+        return
+
+    # otherwise, process the feed. Remember to store r.headers for later!
+```
+
+And here is a similar implementation in Javascript/node:
+
+```javascript
+async function updateFeed(feedUrl, lastResponseHeaders) {
+    const request = await fetch(feedUrl, {
+        headers: {
+            'User-Agent': 'ExamplePlayer/1.2; +https://example.com/player/about.html',
+            'Accept': 'application/canimus+json,application/json;q=0.9, */*;q=0.5'
+            'If-None-Match': lastResponseHeaders['Last-Modified'],
+            'If-Modified-Since': lastResponseHeaders['ETag']
+        }
+    });
+
+    if (request.status == 304) {
+        return; // not modified
+    }
+
+    // process the feed; remember to store request.headers for later!
+}
+```
+
+Adapt this to your language and runtime as necessary.
+
 ## Collisions
 
 In order to prevent things like malicious takeovers of band names, as well as the very common case of multiple bands having the same name, artists should be namespaced to the URL of the feed that populates the data.
