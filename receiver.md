@@ -8,7 +8,9 @@ Generally-speaking, the player should periodically refresh the feeds that it has
 
 If a feed or its content disappears in some way other than being explicitly deleted, it should be up to the player to handle this in a graceful manner. For example, content which has just gone offline should be listed as "temporarily unavailable," and then after a certain period of unavailability it could be removed.
 
-The current page of the feed should always be fully processed. Any archival URLs should be retrieved if they were not already processed. This includes both `next` and `previous`.
+The current page of the feed should always be fully processed. Any archival URLs should be retrieved if they were not already processed at a previous update. This includes both `next` and `previous`.
+
+Also, on the first retrieval of a new feed, if there is an `all` link, that could be used as a one-and-done source to get all of the content at once.
 
 ### [`User-Agent`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/User-Agent)
 
@@ -24,7 +26,7 @@ The HTTP `Accept` header declares which feed protocols you accept and prefer, an
 
 A good starting point header value, for clients which only can parse the JSON feed format, might be:
 
-    Accept: application/canimus+json,application/json;q=0.9, */*;q=0.5
+    Accept: application/canimus+json, application/json, */*;q=0.5
 
 If you can also parse YAML, then you would do:
 
