@@ -53,7 +53,6 @@ The following attributes apply to all types of entity:
 * `summary`: A short description of the entity, intended to be one single line of plain text.
 * `description`: A longer description of the entity, formatted as HTML, to be sanitized by the consumer.
 
-* `mbid`: The associated [MusicBrainz identifier](https://musicbrainz.org/doc/MusicBrainz_Identifier)
 * `links`: Associated links; stored as an array of property dictionaries, each of which includes the following attributes:
     * `name`: The display name of the link; **required**
     * `href`: The target of the link; **required**
