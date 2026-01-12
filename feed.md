@@ -124,7 +124,8 @@ It has the following additional properties:
 * `subtitle`: The subtitle of the track, if any
 * `artist`: The releasing artist of this track, which may differ from the album artist; if not specified it should default to the `artist` of the containing `album`, or the `name` of the containing `artist`.
 * `album`: The name of the album on which this track appears, if any; this is normally implied by the `name` of the containing `album`, and in the case of a single release, may be blank
-* `composer`: The composer of the track
+* `composer`: The composer(s) of the track's music
+* `lyricist`: The author(s) of the track's lyrics
 * `original-artist`: The original performing artist, if this song is a cover
 * `duration`: The canonical length of the track, in seconds
 * `media`: A set of descriptors for to streamable versions of the audio. This *should* at the very least contain an `audio/mp3` version for maximum compatibility, but may also contain other versions. Each descriptor contains the following properties:
