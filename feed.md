@@ -18,7 +18,7 @@ in the HTML `<head>`, and with a recommendation of also providing a [`Link:` HTT
 
 These are the entities which can be defined by the feed.
 
-All attributes are ***optional*** unless otherwise specified.
+All attributes are ***optional*** unless otherwise specified. Attribute names **should** be rendered in all-lowercase and use `-` for the word separator.
 
 The following attributes apply to all types of entity:
 
@@ -33,6 +33,8 @@ The following attributes apply to all types of entity:
 * `updated-date`: The date of the last update, in `YYYY-MM-DD` format
 
     For both of these, partial dates are acceptable in the event that only the year or year and month are available.
+
+    For consistency, this should be serialized as a string even if the serialization format supports datetimes (e.g. YAML).
 
 * `images`: A collection of images that are relevant to the display of the content. This is to be stored as a key-value dictionary, where the key is the type of image, and the value describes the image.
 
