@@ -18,7 +18,7 @@ in the HTML `<head>`, and with a recommendation of also providing a [`Link:` HTT
 
 These are the entities which can be defined by the feed.
 
-All attributes are ***optional*** unless otherwise specified. Attribute names **should** be rendered in all-lowercase and use `-` for the word separator.
+All attributes are ***optional*** unless otherwise specified. Attribute names **should** be rendered in all-lowercase and use underscores (`_`) for the word separator. This enables the most compatibility across languages and use cases.
 
 The following attributes apply to all types of entity:
 
@@ -29,8 +29,8 @@ The following attributes apply to all types of entity:
 
     At least one of `url` or `uid` is **required**
 
-* `release-date`: The original release date, in `YYYY-MM-DD` format; **strongly recommended**
-* `updated-date`: The date of the last update, in `YYYY-MM-DD` format
+* `release_date`: The original release date, in `YYYY-MM-DD` format; **strongly recommended**
+* `updated_date`: The date of the last update, in `YYYY-MM-DD` format
 
     For both of these, partial dates are acceptable in the event that only the year or year and month are available.
 
@@ -101,7 +101,7 @@ For this reason, past page URLs must also be stable; if the June 2025 page has a
 
 An entity of type `collection` is a generic grouping that can contain any number of any other entities. It has the following additional attributes:
 
-* `collection-type`: What type of collection it is; possible values would include `library`, `label`, `distributor`, and so on
+* `collection_type`: What type of collection it is; possible values would include `library`, `label`, `distributor`, and so on
 
 ## Artist
 
@@ -128,7 +128,7 @@ It has the following additional properties:
 * `album`: The name of the album on which this track appears, if any; this is normally implied by the `name` of the containing `album`, and in the case of a single release, may be blank
 * `composer`: The composer(s) of the track's music
 * `lyricist`: The author(s) of the track's lyrics
-* `original-artist`: The original performing artist, if this song is a cover
+* `original_artist`: The original performing artist, if this song is a cover
 * `duration`: The canonical length of the track, in seconds
 * `media`: A set of descriptors for to streamable versions of the audio. This *should* at the very least contain an `audio/mp3` version for maximum compatibility, but may also contain other versions. Each descriptor contains the following properties:
 
