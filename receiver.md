@@ -94,11 +94,11 @@ In order to prevent things like malicious takeovers of band names, as well as th
 
 Multiple feeds may represent the same entities, which can be verified by both sources providing links with a `rel` of `this` which indicate this endorsement; for example, if feed A and feed B refer to each other with such a link, it can be assumed that their content may be merged. Additionally, any `rel` of `canonical` should be used to indicate which one "wins" in the case of conflicts, or should be used as the source of ground truth.
 
-## Private libraries
+## <span id="private">Private libraries</span>
 
 One of the ways that the major commercial streaming platforms acquired their early mindshare with the listening public was to allow listeners to upload their own private purchased libraries, enabling them to bring their purchased collection with them everywhere. This functionality should also be made available in a receiver.
 
-Rather than requiring that people upload their (often gigantic) collections to a server somewhere and the copyright nightmares that would entail, one possible mechanism would be for the player engines to allow people to self-host their own collection, possibly using a service that they run from their home network (á la Plex).
+Rather than requiring that people upload their (often gigantic) collections to a server somewhere and the copyright nightmares that would entail, one possible mechanism would be for the player engines to allow people to self-host their own collection, possibly using a service that they run from their home network (akin to Plex or Jellyfin, and this could even be built as a plugin for those platforms).
 
 This is an implementation detail of the receiver, but one basic suggestion would be for users to be able to run a simple media server that presents a Canimus feed to their collection and requires some simple authentication path between this collection and the receiver, e.g. an API token or HTTP basic auth credentials.
 
