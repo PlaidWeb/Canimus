@@ -27,23 +27,21 @@ This is an expansion on the ideas stated in "[A fair independent streaming platf
 
 The following terms are used to describe the different parts of the system:
 
-* **format**: The document that describes the data format
-* **catalog**: A collection of musical content, typically containing albums and/or individual tracks
-* **feed**: An update/event feed
-* **receiver**: A system that subscribes to and processes feeds to add into a local musical content store
+* **publisher**: A source of data into the network, such as a website operated by an independent artist or a music label
+* **receiver**: A system that subscribes to and aggregates Canimus collections as a backing storage for a player
 * **player**: The user-facing interface that is used to browse and listen to music known by a receiver
 
 ## Documents
 
 For more detailed information on each part of the system, please consult the following sub-documents:
 
-* [format](format.md): Defines the data format
+* [format](format.md): Defines the Canimus data format
 * [receiver](receiver.md): Defines (broadly) how a receiver may consume Canimus data
 * [payments](payments.md): Defines (broadly) some ideas for how musicians may be supported in the network
 
 ## FAQ
 
-### Why a new format?
+### Why this format?
 
 While there are existing feed/collection formats out there, finding one that presents a collection of items in a structured manner that properly represents the world of music is difficult. Music can come in many different shapes, and most commonly it is in the form of collections of albums of songs, and the order of the songs within those albums matters.
 
