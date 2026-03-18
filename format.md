@@ -74,6 +74,8 @@ The following attributes apply to all types of entity:
 
 The top-level entity should have a type of `root`. A `root` entity cannot be contained by other entities.
 
+An older version of the specification called this `feed` and that should be accepted but considered deprecated.
+
 The root entity can contain the following additional attributes:
 
 * `deleted`: Items that have been explicitly removed from the collection, given as a list of property dictionaries which can uniquely identify the content; for example, it **must** contain at least one of `url` and `uid`, and **should** contain other identifying information such as `name`. Deleted items must not appear anywhere else in the collection.
@@ -224,9 +226,13 @@ For example:
 
 As with `album`, the position in the `children` list is what indicates the natural playback order of the song within the playlist; `track` and `disc` are used only for display purposes.
 
-## Feed
+## Events
 
-A `feed` entity represents a time-based event feed to indicate interaction events. It is similar to a `playlist` but is meant to be ephemeral in nature. Its `children` elements would then typically be `track` or, less commonly, `album` elements, with the following additional attributes:
+An `events` entity represents a time-based event feed to indicate interaction events. It is similar to a `playlist` but is meant to be ephemeral in nature.
+
+The intention is that an individual user could publish a Canimus collection containing an `events` element as part of a greater recommendation system (with users subscribing to each others' feeds), and be similar to a "scrobbling" system such as [Last.fm](https://last.fm/), [Libre.fm](https://libre.fm/), or [ListenBrainz](https://listenbrainz.org/). However, its inclusion is only tentative and it is probably better for social elements to be in their own purpose-specific feed format that is expressed by e.g. ActivityPub, Atom, RSS, or similar.
+
+Its `children` elements would then typically be `track` or, less commonly, `album` elements, with the following additional attributes:
 
 * `when`: When the item was added to the feed (i.e. when the event took place); this should be a date in a commonly-parseable format that is also timezone-aware
 * `disposition`: What the listener did with the item; this can be one of the following:
@@ -236,4 +242,3 @@ A `feed` entity represents a time-based event feed to indicate interaction event
     * `dislike`: Indicates that this item was not enjoyed
 * `comment`: Any comment left by the listener, expressing why they liked or disliked the item
 
-The intention is that this `feed` would be expressed by a user's receiver as part of a greater recommendation system (with users subscribing to each others' feeds), and be similar to a "scrobbling" system such as [Last.fm](https://last.fm/), [Libre.fm](https://libre.fm/), or [ListenBrainz](https://listenbrainz.org/).
