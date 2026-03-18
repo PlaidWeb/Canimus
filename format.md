@@ -1,22 +1,22 @@
-# Canimus feed format
+# Canimus format
 
-A feed is formatted as structured data, provided in a commonly-parseable format that provides nested key-value pairs and arrays of data. Every hierarchical layer represents a single entity, which may contain other entities.
+A Canimus collection is formatted as structured data, provided in a commonly-parseable format that provides nested key-value pairs and arrays of data. Every hierarchical layer represents a single entity, which may contain other entities.
 
 A case can be made for embedding the data directly into webpages using [microformats](https://microformats.org/). However, quite a few of the existing systems for music distribution are implemented as single-page applications and do not offer server-side rendering, and for those existing systems it would be much easier for them to present the data via an API endpoint, for which there is no meaningful advantage to HTML+mf2 or the like. For this reason, it presents a much lower-friction path to having a structured feed format as the primary interchange format.
 
 JSON is likely the simplest to implement and to build validation tools for, as most current web frameworks and languages already have direct first-class support for JSON. However, other formats such as XML and YAML are also plausible and should be considered.
 
-For the sake of this document, the assumption will be that the feed is written in JSON format, and that there is a standard for JSON discovery from the associated webpages, such as a `<link>`, for example:
+For the sake of this document, the assumption will be that the data is serialized in JSON format, and that there is a standard for JSON discovery from the associated webpages, such as a `<link>`, for example:
 
 ```html
-<link rel="alternate" type="application/canimus+json" href="/path/to/feed.json">
+<link rel="alternate" type="application/canimus+json" href="/path/to/canimus.json">
 ```
 
 in the HTML `<head>`, and with a recommendation of also providing a [`Link:` HTTP response header](https://www.w3.org/wiki/LinkHeader).
 
 ## Entity definitions
 
-These are the entities which can be defined by the feed.
+These are the entities which can be defined by the collection.
 
 All attributes are ***optional*** unless otherwise specified. Attribute names **should** be rendered in all-lowercase and use underscores (`_`) for the word separator. This enables the most compatibility across languages and use cases.
 
@@ -25,7 +25,7 @@ The following attributes apply to all types of entity:
 * `type`: The type of entity being defined; **required**
 * `name`: The common name of the entity
 * `url`: The canonical URL for an HTML representation of the current entity, e.g. the webpage for the label/artist/album/track
-* `uid`: An opaque, permanent string identifier to uniquely identify this entity relative to this feed; this defaults to `url` if not specified
+* `uid`: An opaque, permanent string identifier to uniquely identify this entity relative to this collection; this defaults to `url` if not specified
 
     At least one of `url` or `uid` is **required**
 
@@ -68,40 +68,34 @@ The following attributes apply to all types of entity:
         * `icon`: A small image to represent the link, formatted the same way as it would be in `images`
         * `license`: A full description of the license terms for the item
 
-* `children`: A list of entities that are contained by this entity.
+* `children`: A list of entities that are contained by this entity. These entities may be of any type aside from `root` unless otherwise specified.
 
-## Top level
+## Top level (root)
 
-The top-level entity has a type of `feed`.
+The top-level entity should have a type of `root`. A `root` entity cannot be contained by other entities.
 
-A feed supports the following additional attributes:
+The root entity can contain the following additional attributes:
 
-* `deleted`: Items that have been explicitly removed from the collection, given as a list of property dictionaries which can uniquely identify the content; for example, it **must** contain at least one of `url` and `uid`, and **should** contain other identifying information such as `name`. Deleted items must not appear anywhere else in the feed.
+* `deleted`: Items that have been explicitly removed from the collection, given as a list of property dictionaries which can uniquely identify the content; for example, it **must** contain at least one of `url` and `uid`, and **should** contain other identifying information such as `name`. Deleted items must not appear anywhere else in the collection.
 
-A feed supports the following additional link types, with the `rel` value set accordingly:
+A collection supports the following additional link types, with the `rel` value set accordingly:
 
-* `websub`: A link to a [WebSub](https://en.wikipedia.org/wiki/WebSub) hub, where a receiver can subscribe to immediate updates to this feed
+* `websub`: A link to a [WebSub](https://en.wikipedia.org/wiki/WebSub) hub, where a receiver can subscribe to immediate updates to this collection
 * Links for pagination, as described in the following "Pagination" subsection.
 
 ### Pagination
 
-Many feeds will be much too large for all data to be provided in a single view, and so there must be a means of breaking the feed up into chunks that can be incrementally retrieved. In order to facilitate this, the feed's `related` links may contain the following link types:
+Some collections (such as for a record label or a private storage server) will be much too large for all data to be provided in a single view, and so there must be a means of breaking it up into chunks that can be incrementally retrieved. In order to facilitate this, the collection's `related` links may contain the following link types:
 
 * `self`: The canonical URL to this specific page, if this is an archival page
-* `current`: The URL to the current/most recent page of the feed (typically the main URL to the feed itself); **required** if this is not the current page
-* `next`: The next page of the feed, in the event that we are paginating
-* `previous`: The previous page of the feed, in the event that we are paginating
-* `all`: A link to a feed that contains the full content of the collection, if that's feasible/reasonable
+* `current`: The URL to the current/most recent page of the collection (typically the main URL to the collection itself); **required** if this is not the current page
+* `next`: The next page of the collection, in the event that we are paginating
+* `previous`: The previous page of the collection, in the event that we are paginating
+* `all`: A URL that contains the full content of the collection, if that's feasible/reasonable
 
-Any changes which occur to elements which appeared on prior pages *MUST* appear on the page that is current at the time that the change took place. For example, if a piece of music that was published in January of 2020 was deleted in June of 2025, it's the page reflecting June 2025 that would contain the deletion. Similarly, updates to song metadata would occur in the feed at the time that the update happened. In this way, feed consumers do not need to re-traverse the entire backlog of a large feed to get all updates, and can incrementally update only by retrieving the current feed and any pages that haven't already been retrieved.
+Any changes which occur to elements which appeared on prior pages *MUST* appear on the page that is current at the time that the change took place. For example, if a piece of music that was published in January of 2020 was deleted in June of 2025, it's the page reflecting June 2025 that would contain the deletion. Similarly, updates to song metadata would occur in the collection at the time that the update happened. In this way, collection consumers do not need to re-traverse the entire backlog of a large collection to get all updates, and can incrementally update only by retrieving the current page and any pages that haven't already been retrieved.
 
-For this reason, past page URLs must also be stable; if the June 2025 page has a URL of e.g. `https://example.com/feed/2025-06.json`, then it must *always* be at that URL. In this way, a consumer can stop traversing a feed once it has encountered an archival feed URL that it has already processed.
-
-## Collection
-
-An entity of type `collection` is a generic grouping that can contain any number of any other entities. It has the following additional attributes:
-
-* `collection_type`: What type of collection it is; possible values would include `library`, `label`, `distributor`, and so on
+For this reason, past page URLs must also be stable; if the June 2025 page has a URL of e.g. `https://example.com/canimus/2025-06.json`, then it must *always* be at that URL. In this way, a consumer can stop traversing pages once it has encountered an archival URL that it has already processed.
 
 ## Artist
 
@@ -189,7 +183,7 @@ A curated list of music to listen to, including tracks and albums. This can be u
 
 * `author`: The author of the playlist
 
-The `children` of this must include at least as much information as is necessary to recreate the entity assuming that this feed is the only data available. For example, for a `track` that is contained within the `feed`, only `url` or `uid` are strictly necessary, but for music stored in other `feed`s it must contain the full metadata from the other feed.
+The `children` of this must include at least as much information as is necessary to recreate the entity assuming that this entity is the only data available. For example, for a `track` that is contained within the `catalog`, only `url` or `uid` are strictly necessary, but for music stored in other collections it must contain the full metadata from the other collection.
 
 For example:
 
@@ -230,3 +224,16 @@ For example:
 
 As with `album`, the position in the `children` list is what indicates the natural playback order of the song within the playlist; `track` and `disc` are used only for display purposes.
 
+## Feed
+
+A `feed` entity represents a time-based event feed to indicate interaction events. It is similar to a `playlist` but is meant to be ephemeral in nature. Its `children` elements would then typically be `track` or, less commonly, `album` elements, with the following additional attributes:
+
+* `when`: When the item was added to the feed (i.e. when the event took place); this should be a date in a commonly-parseable format that is also timezone-aware
+* `disposition`: What the listener did with the item; this can be one of the following:
+    * `play`: Indicates that this was an item played to completion
+    * `skip`: Indicates that this item was skipped over, possibly after being partially played
+    * `like`: Indicates that this item was enjoyed
+    * `dislike`: Indicates that this item was not enjoyed
+* `comment`: Any comment left by the listener, expressing why they liked or disliked the item
+
+The intention is that this `feed` would be expressed by a user's receiver as part of a greater recommendation system (with users subscribing to each others' feeds), and be similar to a "scrobbling" system such as [Last.fm](https://last.fm/), [Libre.fm](https://libre.fm/), or [ListenBrainz](https://listenbrainz.org/).

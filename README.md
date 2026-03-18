@@ -1,6 +1,6 @@
 # Canimus
 
-The Canimus feed format is a syndication format to allow for federated discovery of streamable music in a platform-agnostic manner.
+Canimus is a syndication format to allow for federated discovery of streamable music in a platform-agnostic manner.
 
 Canimus is the Latin first-person plural progressive form of [canō](https://en.wiktionary.org/wiki/cano#Latin), which has several meanings:
 
@@ -27,8 +27,9 @@ This is an expansion on the ideas stated in "[A fair independent streaming platf
 
 The following terms are used to describe the different parts of the system:
 
-* **feed**: The document that describes musical content for the network
-* **collection**: A collection of musical content
+* **format**: The document that describes the data format
+* **catalog**: A collection of musical content, typically containing albums and/or individual tracks
+* **feed**: An update/event feed
 * **receiver**: A system that subscribes to and processes feeds to add into a local musical content store
 * **player**: The user-facing interface that is used to browse and listen to music known by a receiver
 
@@ -36,8 +37,8 @@ The following terms are used to describe the different parts of the system:
 
 For more detailed information on each part of the system, please consult the following sub-documents:
 
-* [feed](feed.md): Defines the feed format
-* [receiver](receiver.md): Defines (broadly) how a receiver may consume feeds
+* [format](format.md): Defines the data format
+* [receiver](receiver.md): Defines (broadly) how a receiver may consume Canimus data
 * [payments](payments.md): Defines (broadly) some ideas for how musicians may be supported in the network
 
 ## FAQ
@@ -48,11 +49,11 @@ While there are existing feed/collection formats out there, finding one that pre
 
 Much of the metadata for the items *tends* to be consistent across an entire collection, but there are always exceptions that need to be captured in some way.
 
-Most current feed formats also exist to present new content in a stream of ephemera, without much attention given to older items.
+Most current formats also exist to present new content in a stream of ephemera, without much attention given to older items.
 
 The Canimus format attempts to encapsulate a collection of music, which can be browsed, revisited, and categorized, while also taking advantage of the overall structure of an album as a sequential series of related songs, without necessarily being limited to that structure.
 
-This format is also intended to be easy to publish and to parse, without any guesswork about what anything actually means. Musicians shouldn't have to sign up for every new distributed platform that springs up, when those platforms could subscribe to a common feed format as one potential source for music. They should be able to just add it as a format to publish their music to the web in a way that is, hopefully, easy to adapt into other ecosystems.
+This format is also intended to be easy to publish and to parse, without any guesswork about what anything actually means. Musicians shouldn't have to sign up for every new distributed platform that springs up, when those platforms could subscribe to a common format as one potential source for music. They should be able to just add it as a format to publish their music to the web in a way that is, hopefully, easy to adapt into other ecosystems.
 
 ### Why not use RSS/Atom?
 
@@ -82,13 +83,13 @@ This is a starting point for something better than what exists currently.
 
 ### Why should something use Canimus instead of anything else?
 
-It shouldn't! Different formats are good at different things. Canimus is meant to live alongside other protocols, and it purposefully excludes functionality other than sharing music. There is no intention to add any functionality like real-time status posts, blog entries, or podcasts, all of which are served better by other feed formats such as RSS and Atom.
+It shouldn't! Different formats are good at different things. Canimus is meant to live alongside other protocols, and it purposefully excludes functionality other than sharing music. There is no intention to add any functionality like real-time status posts, blog entries, or podcasts, all of which are served better by social feed formats such as RSS and Atom.
 
 It is also not meant to be an encyclopedic compendium of all music; this is not a replacement to MusicBrainz, for example, although the end-user's software interoperating with MusicBrainz as a source of ground truth for metadata is certainly desirable.
 
-From a publisher's standpoint, a Canimus feed is just another template to add to a website, to make it easier for music to be discovered and listened to.
+From a publisher's standpoint, Canimus is just another template to add to a website, to make it easier for music to be discovered and listened to.
 
-From a player's standpoint, a Canimus feed is just another means of obtaining a collection of music.
+From a player's standpoint, Canimus is just another means of obtaining a collection of music.
 
 Nothing about this is exclusive; it's just meant to be simpler to support on both sides.
 
@@ -96,8 +97,8 @@ Nothing about this is exclusive; it's just meant to be simpler to support on bot
 
 Access control is generally better-served at a different level on a content delivery stack than the end format.
 
-The intention is that a Canimus feed, by default, provides that which the musician wants to be listened to, at whatever quality level makes the most sense for what is essentially a free preview.
+The intention is that a Canimus collection, by default, provides that which the musician wants to be listened to, at whatever quality level makes the most sense for what is essentially a free preview.
 
-The hope is that there will eventually be a standard protocol for allowing receivers to manage access tokens in order to fetch full-quality versions of feeds or bonus content and the like (with the same mechanism preventing someone from simply republishing the underlying media URLs unprotected). This can take many forms, such as [standard HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Authentication) (particularly bearer tokens), but the ideal long-term goal is that people would use this as a mechanism to find music to purchase and download into their own local collections.
+The hope is that there will eventually be a standard protocol for allowing receivers to manage access tokens in order to fetch full-quality versions or bonus content and the like (with the same mechanism preventing someone from simply republishing the underlying media URLs unprotected). This can take many forms, such as [standard HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Authentication) (particularly bearer tokens), but the ideal long-term goal is that people would use this as a mechanism to find music to purchase and download into their own local collections.
 
 That local collection could then be served up in turn as a private Canimus collection; there is some discussion about how that might work in the [receiver document](receiver.md#private).
