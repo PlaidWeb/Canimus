@@ -105,6 +105,9 @@ Access control is generally better-served at a different level on a content deli
 
 The intention is that a Canimus collection, by default, provides that which the musician wants to be listened to, at whatever quality level makes the most sense for what is essentially a free preview.
 
-The hope is that there will eventually be a standard protocol for allowing receivers to manage access tokens in order to fetch full-quality versions or bonus content and the like (with the same mechanism preventing someone from simply republishing the underlying media URLs unprotected). This can take many forms, such as [standard HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Authentication) (particularly bearer tokens), but the ideal long-term goal is that people would use this as a mechanism to find music to purchase and download into their own local collections.
+The hope is that there will eventually be a standard mechanism for allowing receivers to manage access tokens in order to fetch full-quality versions or bonus content and the like (with the same mechanism preventing someone from simply republishing the underlying media URLs unprotected). This can take many forms, such as [standard HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Authentication) (particularly bearer tokens) or something OAuth-based, but the ideal long-term goal is that people would use this as a mechanism to find music to purchase and download into their own local collections.
 
 That local collection could then be served up in turn as a private Canimus collection; there is some discussion about how that might work in the [receiver document](receiver.md#private).
+
+The overall goal of this project is to turn listeners into collectors. The existence of music should not be contingent on the long-term durability of its hosting provider.
+
