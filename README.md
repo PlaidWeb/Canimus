@@ -71,6 +71,14 @@ There are several ActivityPub-based music federation projects underway as well. 
 
 Any implementation of a music collection on top of ActivityPub would still have to implement the collection itself, and maintain standards for how backfilling works and how the collection is shaped, so why not start with a clean implementation that only provides the parts that are important to a music collection to begin with?
 
+### Why not microformats?
+
+While microformats are a very nice means of embedding metadata into HTML documents without requiring so-called "sidecar" formats, the unfortunate reality is that many content platforms these days are not serving up static HTML; instead they are built as app-style frontends which require Javascript to fetch the actual page content using frameworks like ReactJS and Vue, and while it would be really nice if we were still in a server-side-rendering-first web, that is no longer the case.
+
+Additionally, parsing and presenting microformats can be a lot more complicated even in a pure-static HTML-based ecosystem, and it doesn't provide any greater efficiency than linking to a sidecar file or endpoint.
+
+As such, while microformats are a very nice approach in theory, the practical concerns make it not very compelling for this use case.
+
 ### What about [missing feature]?
 
 The specification in its current form is certainly not the final word, and can and should be extended as use cases are uncovered. Every attempt has been made to keep it extensible and flexible, but of course there will be things that are missing as well.
