@@ -38,6 +38,7 @@ For more detailed information on each part of the system, please consult the fol
 * [format](format.md): Defines the Canimus data format
 * [receiver](receiver.md): Defines (broadly) how a receiver may consume Canimus data
 * [payments](payments.md): Defines (broadly) some ideas for how musicians may be supported in the network
+* [examples](examples.json): An example feed demonstrating several different use cases
 
 ## FAQ
 
@@ -110,4 +111,3 @@ The hope is that there will eventually be a standard mechanism for allowing rece
 That local collection could then be served up in turn as a private Canimus collection; there is some discussion about how that might work in the [receiver document](receiver.md#private).
 
 The overall goal of this project is to turn listeners into collectors. The existence of music should not be contingent on the long-term durability of its hosting provider.
-

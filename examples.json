@@ -1,0 +1,139 @@
+{
+  "type": "root",
+  "protocol": "Canimus",
+
+  "children": [
+    {
+      "type": "artist",
+      "name": "Example Band",
+      "url": "https://example.band",
+      "uid": "1234-exampleband",
+      "description": "The hit indie band from Exampletown, Idaho",
+      "children": [
+        {
+          "type": "track",
+          "name": "Hit Single",
+          "url": "https://example.band/track/hit-single",
+          "duration": 245,
+          "lyrics": "This is a song\nIt is not very long\nWould you please listen\nTo this silly song",
+          "media": [
+            {
+              "type": "audio/mp3",
+              "src": "https://example.band/audio/hit-single.mp3",
+              "size": 8008135
+            }
+          ]
+        },
+        {
+          "type": "album",
+          "name": "Self-Titled Album",
+          "url": "https://example.band/album/self-titled",
+          "description": "This album has three tracks on it.",
+          "date": "2024-02-29",
+          "children": [
+            {
+              "type": "track",
+              "name": "First track",
+              "url": "https://example.band/track/first-track",
+              "media": [
+                {
+                  "type": "audio/mp3",
+                  "src": "https://example.band/audio/first-track.mp3",
+                  "size": 7432893
+                }
+              ]
+            },
+            {
+              "type": "track",
+              "name": "Second track",
+              "url": "https://example.band/track/second-track",
+              "media": [
+                {
+                  "type": "audio/mp3",
+                  "src": "https://example.band/audio/second-track.mp3",
+                  "size": 236788972
+                }
+              ]
+            },
+            {
+              "type": "track",
+              "name": "Third track",
+              "url": "https://example.band/track/third-track",
+              "media": [
+                {
+                  "type": "audio/mp3",
+                  "src": "https://example.band/audio/third-track.mp3",
+                  "size": 2368293
+                }
+              ]
+            },
+            {
+              "type": "track",
+              "name": "Final track",
+              "url": "https://example.band/track/final-track",
+              "featuring": [
+                { "name": "Collaborating Band 1", "uid": "collab-band-1" }
+              ],
+              "media": [
+                {
+                  "type": "audio/mp3",
+                  "src": "https://example.band/audio/final-track.mp3",
+                  "size": 2368293
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "artist",
+      "name": "Collaborating band 1",
+      "uid": "collab-band-1"
+    },
+    {
+      "type": "artist",
+      "name": "Collaborating band 2",
+      "uid": "collab-band-2"
+    },
+    {
+      "type": "album",
+      "name": "Our Collaboration",
+      "url": "https://example.band/collabs/our-collaboration",
+      "description": "A bunch of us got together to record an album in a weekend.",
+      "children": [
+        {
+          "type": "track",
+          "artist": { "name": "Example Band", "uid": "1234-exampleband" },
+          "name": "Setting the example",
+          "url": "https://example.band/collabs/our-collaboration/1",
+          "media": [
+            { "src": "https://example.band/collabs/our-collaboration/1.mp3" }
+          ]
+        },
+        {
+          "type": "track",
+          "artist": { "name": "Collaborating band 1", "uid": "collab-band-1" },
+          "name": "The second track",
+          "url": "https://example.band/collabs/our-collaboration/2",
+          "media": [
+            { "src": "https://example.band/collabs/our-collaboration/2.mp3" }
+          ]
+        },
+        {
+          "type": "track",
+          "artist": { "name": "Collaborating band 2", "uid": "collab-band-2" },
+          "featuring": [
+            { "uid": "1234-exampleband" },
+            "Some random stranger who showed up in the studio"
+          ],
+          "name": "The second track",
+          "url": "https://example.band/collabs/our-collaboration/2",
+          "media": [
+            { "src": "https://example.band/collabs/our-collaboration/2.mp3" }
+          ]
+        }
+      ]
+    }
+  ]
+}

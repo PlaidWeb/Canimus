@@ -79,7 +79,7 @@ Some property types may be a simple display string, or they may be a reference t
 * `rel`: The relationship of this entity
 * `label`: A text label describing the relationship
 
-If the entity reference is given as a basic string, it will be interpreted as a `name` that overrides the natural default entity.
+If the entity reference is given as a basic string, it will be interpreted as a `name` that overrides the natural default entity's.
 
 If a `uid` is given, a matching entity **must** appear in the same Canimus document.
 
