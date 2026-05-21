@@ -18,7 +18,7 @@ in the HTML `<head>`, and with a recommendation of also providing a [`Link:` HTT
 
 These are the entities which can be defined by the collection.
 
-All attributes are ***optional*** unless otherwise specified. Attribute names **should** be rendered in all-lowercase and use underscores (`_`) for the word separator. This enables the most compatibility across languages and use cases.
+All attributes are **optional** unless otherwise specified. Attribute names **should** be rendered in all-lowercase and use underscores (`_`) for the word separator. This enables the most compatibility across languages and use cases.
 
 The following attributes apply to all types of entity:
 
@@ -70,6 +70,17 @@ The following attributes apply to all types of entity:
 
 * `children`: A list of entities that are contained by this entity. These entities may be of any type aside from `root` unless otherwise specified.
 
+### <span id="entity-reference">Entity references</span>
+
+Some property types may be a simple display string, or they may be a reference to another entity. In the case of an entity reference, it will be a property bag containing the following properties:
+
+* `uid`: The `uid` of the referenced entity (required)
+* `name`: The display name within the context of the entity, e.g. to override the display name
+
+If the entity reference is given as a basic string, it will be interpreted as a `name` that overrides the natural default entity.
+
+If a `uid` is given, a matching entity **must** appear in the same Canimus document.
+
 ## Top level (root)
 
 The top-level entity should have a type of `root`. A `root` entity cannot be contained by other entities.
@@ -77,6 +88,9 @@ The top-level entity should have a type of `root`. A `root` entity cannot be con
 An older version of the specification called this `feed` and that should be accepted but considered deprecated.
 
 The root entity can contain the following additional attributes:
+
+* `protocol`: Refers to the protocol of the file, i.e. `"Canimus"`
+* `version`: Refers to the base Canimus specification version in effect; this can be given as a tag or a commit hash within the [main Canimus repository](https://github.com/PlaidWeb/Canimus), e.g. `"v0.1.0"` or `"411bcce"`.
 
 * `deleted`: Items that have been explicitly removed from the collection, given as a list of property dictionaries which can uniquely identify the content; for example, it **must** contain at least one of `url` and `uid`, and **should** contain other identifying information such as `name`. Deleted items must not appear anywhere else in the collection.
 
@@ -99,19 +113,24 @@ Any changes which occur to elements which appeared on prior pages *MUST* appear 
 
 For this reason, past page URLs must also be stable; if the June 2025 page has a URL of e.g. `https://example.com/canimus/2025-06.json`, then it must *always* be at that URL. In this way, a consumer can stop traversing pages once it has encountered an archival URL that it has already processed.
 
+Note that different pages of a Canimus feed are considered to be separate documents, for the purpose of [entity references](#entity-reference).
+
 ## Artist
 
 An entity of type `artist` is a performing artist. The `name` attribute refers to the primary name under which the artist releases.
 
 ## Album
 
-An entity of type `album` is a collection of songs. The `name` attribute refers to the title of the album. It contains the following additional properties:
+An entity of type `album` is a collection of tracks. The `name` attribute refers to the title of the album. It contains the following additional properties:
 
-* `artist`: The releasing artist of this album (also known as "album artist"). It defaults to the `name` of the containing `artist`. If no such name is specified, it is up to the consumer how to display the album-level attribution.
+* `artist`: An [entity reference](#entity-reference) to the releasing artist of this album (also known as "album artist"). It defaults to the `name` and `uid` of the containing `artist`, if any.
 * `subtitle`: The subtitle of the album
 * `copyright`: The copyright information of the album
 * `license`: Any additional license information, e.g. `"CC by-nc-sa"`
 * `genre`: An arbitrary string of text that may indicate vaguely what sorts of people might like the music on this album
+* `featuring`: An array of additional featured artists as [entity references](#entity-reference), to indicate collaborations
+
+Note that an `album` does not necessarily have to be contained by an `artist` node.
 
 ## Track
 
@@ -120,13 +139,14 @@ An entity of type `track` refers to a playable track. If it is contained by an `
 It has the following additional properties:
 
 * `subtitle`: The subtitle of the track, if any
-* `artist`: The releasing artist of this track, which may differ from the album artist; if not specified it should default to the `artist` of the containing `album`, or the `name` of the containing `artist`.
-* `album`: The name of the album on which this track appears, if any; this is normally implied by the `name` of the containing `album`, and in the case of a single release, may be blank
+* `artist`: An [entity reference](#entity-reference) to the releasing artist of this track, which may differ from the album artist; if not specified it should default to the `artist` of the containing `album` or `artist`.
+* `featuring`: An array of additional featured artists as [entity references](#entity-reference), to indicate collaborations
+* `album`: An [entity reference](#entity-reference) to the album on which this track appears, if any; this is normally implied by the containing `album`, and in the case of a single release, may be blank.
 * `composer`: The composer(s) of the track's music
 * `lyricist`: The author(s) of the track's lyrics
 * `original_artist`: The original performing artist, if this song is a cover
 * `duration`: The canonical length of the track, in seconds
-* `media`: A set of descriptors for to streamable versions of the audio. This *should* at the very least contain an `audio/mp3` version for maximum compatibility, but may also contain other versions. Each descriptor contains the following properties:
+* `media`: A set of descriptors providing streamable versions of the audio. This **should** at the very least contain an `audio/mp3` and/or `audio/ogg` version for maximum compatibility, but may also contain other versions. Each descriptor contains the following properties:
 
     * `type`: The content-type of the media (e.g. `audio/mp3`, `audio/flac`, `video/mp4`, `application/x-mpegURL`, etc.); **required**
     * `src`: The URL at which the media can be played; **required**
@@ -153,6 +173,11 @@ An example track might look like:
 {
     "type": "track",
     "artist": "The Example Band",
+    "featuring": ["Another Band",
+      {
+        "name": "Yet another band",
+        "uid": "asdf-12345"
+      }],
     "name": "Introduction",
     "subtitle": "Radio Edit",
     "uid": "13a93b29-4e4b-4967-a077-cbe8491767ec",
@@ -241,4 +266,3 @@ Its `children` elements would then typically be `track` or, less commonly, `albu
     * `like`: Indicates that this item was enjoyed
     * `dislike`: Indicates that this item was not enjoyed
 * `comment`: Any comment left by the listener, expressing why they liked or disliked the item
-
