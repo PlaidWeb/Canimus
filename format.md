@@ -72,10 +72,12 @@ The following attributes apply to all types of entity:
 
 ### <span id="entity-reference">Entity references</span>
 
-Some property types may be a simple display string, or they may be a reference to another entity. In the case of an entity reference, it will be a property bag containing the following properties:
+Some property types may be a simple display string, or they may be a reference to another entity. In the case of an entity reference, it will be a property bag containing the following properties (all optional unless otherwise specified):
 
-* `uid`: The `uid` of the referenced entity (required)
+* `uid`: The `uid` of the referenced entity
 * `name`: The display name within the context of the entity, e.g. to override the display name
+* `rel`: The relationship of this entity
+* `label`: A text label describing the relationship
 
 If the entity reference is given as a basic string, it will be interpreted as a `name` that overrides the natural default entity.
 
