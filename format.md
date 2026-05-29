@@ -83,6 +83,8 @@ If the entity reference is given as a basic string, it will be interpreted as a 
 
 If a `uid` is given, a matching entity **must** appear in the same Canimus document.
 
+While unlikely, it is theoretically possible for a circular reference to occur. Implementations will need to account for this, although the mechanism by which they do that is outside the scope of this document.
+
 ## Top level (root)
 
 The top-level entity should have a type of `root`. A `root` entity cannot be contained by other entities.
