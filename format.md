@@ -68,7 +68,7 @@ The following attributes apply to all types of entity:
         * `icon`: A small image to represent the link, formatted the same way as it would be in `images`
         * `license`: A full description of the license terms for the item
 
-* `children`: A list of entities that are contained by this entity. These entities may be of any type aside from `root` unless otherwise specified.
+* `children`: A list of entities that are contained by this entity.specified.
 
 ### <span id="entity-reference">Entity references</span>
 
@@ -103,6 +103,8 @@ A collection supports the following additional link types, with the `rel` value 
 * `websub`: A link to a [WebSub](https://en.wikipedia.org/wiki/WebSub) hub, where a receiver can subscribe to immediate updates to this collection
 * Links for pagination, as described in the following "Pagination" subsection.
 
+All entity types are valid `children` aside from `root`.
+
 ### Pagination
 
 Some collections (such as for a record label or a private storage server) will be much too large for all data to be provided in a single view, and so there must be a means of breaking it up into chunks that can be incrementally retrieved. In order to facilitate this, the collection's `related` links may contain the following link types:
@@ -119,11 +121,16 @@ For this reason, past page URLs must also be stable; if the June 2025 page has a
 
 Note that different pages of a Canimus feed are considered to be separate documents, for the purpose of [entity references](#entity-reference).
 
-## Artist
+## <span id="artist">Artist</span>
 
 An entity of type `artist` is a performing artist. The `name` attribute refers to the primary name under which the artist releases.
 
-## Album
+Valid `children` types:
+
+* [`album`](#album)
+* [`track`](#track)
+
+## <span id="album">Album</span>
 
 An entity of type `album` is a collection of tracks. The `name` attribute refers to the title of the album. It contains the following additional properties:
 
@@ -136,7 +143,11 @@ An entity of type `album` is a collection of tracks. The `name` attribute refers
 
 Note that an `album` does not necessarily have to be contained by an `artist` node.
 
-## Track
+Valid `children` types:
+
+* [`track`](#track)
+
+## <span id="track">Track</span>
 
 An entity of type `track` refers to a playable track. If it is contained by an `album`, then it is given a playback order based on its position in the album's `children`; otherwise it is assumed to be a single.
 
@@ -208,7 +219,9 @@ An example track might look like:
 }
 ```
 
-## Playlist
+## <span id="playlist">Playlist</span>
+
+==NOTE:== This section of the specification is especially rough and likely to change.
 
 A curated list of music to listen to, including tracks and albums. This can be useful for an artist to publish a "best of" or a mixtape or the like. It has the following additional properties:
 
@@ -222,6 +235,7 @@ For example:
 {
     "type": "playlist",
     "author": "Example Curator",
+    "uid": "20a481cc-a340-4baf-8d89-d0973e3ec4cc",
     "children": [{
         "type": "track",
         "artist": "Example Band",
@@ -255,13 +269,33 @@ For example:
 
 As with `album`, the position in the `children` list is what indicates the natural playback order of the song within the playlist; `track` and `disc` are used only for display purposes.
 
-## Events
+Valid `children` types:
+
+* [`artist`](#artist)
+* [`album`](#album)
+* [`track`](#track)
+
+## <span id="events">Events</span>
+
+==NOTE:== This section of the specification is especially rough and likely to change.
 
 An `events` entity represents a time-based event feed to indicate interaction events. It is similar to a `playlist` but is meant to be ephemeral in nature.
 
 The intention is that an individual user could publish a Canimus collection containing an `events` element as part of a greater recommendation system (with users subscribing to each others' feeds), and be similar to a "scrobbling" system such as [Last.fm](https://last.fm/), [Libre.fm](https://libre.fm/), or [ListenBrainz](https://listenbrainz.org/). However, its inclusion is only tentative and it is probably better for social elements to be in their own purpose-specific feed format that is expressed by e.g. ActivityPub, Atom, RSS, or similar.
 
-Its `children` elements would then typically be `track` or, less commonly, `album` elements, with the following additional attributes:
+It provides the following properties:
+
+* `author`: The author/originator of the event list
+
+Valid `children` types:
+
+* [`event`](#event)
+
+## <span id="event">Event</span>
+
+==NOTE:== This section of the specification is especially rough and likely to change.
+
+An `event` entity represents an individual interaction event. It contains the following properties:
 
 * `when`: When the item was added to the feed (i.e. when the event took place); this should be a date in a commonly-parseable format that is also timezone-aware
 * `disposition`: What the listener did with the item; this can be one of the following:
@@ -270,3 +304,4 @@ Its `children` elements would then typically be `track` or, less commonly, `albu
     * `like`: Indicates that this item was enjoyed
     * `dislike`: Indicates that this item was not enjoyed
 * `comment`: Any comment left by the listener, expressing why they liked or disliked the item
+* `item`: Either the `uid` of the referenced item, or the item itself (see [playlist items](#playlist))
