@@ -44,7 +44,7 @@ The following attributes apply to all types of entity:
     * `main`: Primary artwork to be displayed in a player (primarily relevant to an album or track, but can also be used as a band fallback for things without artwork, for example)
     * `photo`: A larger photographic image representing the item (headshots, profile images, etc.)
 
-    Each of these keys maps to a dictionary of properties, which include:
+    Each of these keys maps to a dictionary of properties, or an array of dictionaries, each of which include:
 
     * `src`: The URL to retrieve the image from; **required**
     * `alt`: The accessibility alt-text of the image; **strongly recommended**
@@ -59,14 +59,17 @@ The following attributes apply to all types of entity:
     * `name`: The display name of the link; **required**
     * `href`: The target of the link; **required**
     * `type`: The content-type of the link
-    * `rel`: The relation of this link, for example:
+    * `rel`: The relationship of this link to the item. These include, but are not limited to:
         * `canonical`: The URL that is considered the canonical representation of this entity on the web
         * `this`: An alternate URL that is also trusted to represent this entity
+        * `alternate`: A URL that represents an alternate version of this entity
         * `support`: Indicates that this URL is where a listener may provide financial support to the artist
         * `purchase`: Indicates that this URL is where a listener may obtain a copy of this content
         * `video`: A place to see a music video for this content
         * `icon`: A small image to represent the link, formatted the same way as it would be in `images`
         * `license`: A full description of the license terms for the item
+
+        Note that more link relationships may be added in the future as additional needs are identified; as such, a link with an unknown `rel` should be either ignored or collected as an "other" type.
 
 * `children`: A list of entities that are contained by this entity.specified.
 
