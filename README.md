@@ -13,6 +13,8 @@ Canimus is the Latin first-person plural progressive form of [canō](https://en.
 
 Or, in short, *we make music*.
 
+That said, [the name could be better](https://github.com/PlaidWeb/Canimus/issues/12).
+
 ## Rationale
 
 Music discovery, consumption, and streaming is locked down by large corporations that have made a mess of things. The streaming providers have to cater to the whims of the major record labels, and have created a two-tier system where neither discovery nor payments are even remotely fair. Independent musicians are hit hardes by this, as they have to pay money to play a game that is stacked against them, and what little listenership they get is largely divvied up to the major labels. The specific payment strategy that's used has also led to a glut of minimum-effort content and AI slop and bot-driven streaming that tries to game the system, hurting everyone, big and small alike.
