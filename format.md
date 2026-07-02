@@ -48,7 +48,7 @@ The following attributes apply to all types of entity:
 
     * `src`: The URL to retrieve the image from; **required**
     * `alt`: The accessibility alt-text of the image; **strongly recommended**
-    * `width` and `height`: The nominal display sizes of the image
+    * `width` and `height`: The nominal display sizes of the image; **strongly recommended**
     * `type`: The MIME content type of the image (e.g. `image/png`, `image/jpeg`, `image/webp`); **strongly recommended**
     * `alternates`: An array of alternate formats, each a dictionary of properties the same as above (excepting `alternates`)
 
@@ -58,7 +58,7 @@ The following attributes apply to all types of entity:
 * `links`: Associated links; stored as an array of property dictionaries, each of which includes the following attributes:
     * `name`: The display name of the link; **required**
     * `href`: The target of the link; **required**
-    * `type`: The content-type of the link
+    * `type`: The content-type of the link (e.g. `text/html`, `application/rss+xml`, etc.)
     * `rel`: The relationship of this link to the item. These include, but are not limited to:
         * `canonical`: The URL that is considered the canonical representation of this entity on the web
         * `this`: An alternate URL that is also trusted to represent this entity
@@ -71,7 +71,7 @@ The following attributes apply to all types of entity:
 
         Note that more link relationships may be added in the future as additional needs are identified; as such, a link with an unknown `rel` should be either ignored or collected as an "other" type.
 
-* `children`: A list of entities that are contained by this entity.specified.
+* `children`: A list of entities that are contained by this entity.
 
 ### <span id="entity-reference">Entity references</span>
 
@@ -177,13 +177,18 @@ It has the following additional properties:
 * `disc`: The physical disc that the track appeared on, in the case of a multi-disc album
 * `track`: The physical track number for the track on its disc
 
+    Note that `disc` and `track` are purely for display purposes, and do not affect the natural playback order of the track, which is given by the order of the `track` elements within the containing entity's `children`.
+
 * `copyright`: The copyright information of the album (defaults to the containing `album`'s if unspecified)
 * `license`: Any additional license information, e.g. `"CC by-nc-sa"` (defaults to the containing `album`'s if unspecified)
 
 * `lyrics`: The lyrics of the song, if any; this should be provided as plain text with a single `\n` between lines, and `\n\n` between verses. Limited Markdown (such as `*emphasis*` and `**boldface**`) may be supported at the discretion of the consumer.
 * `genre`: An arbitrary string of text that may indicate vaguely what sorts of people might like this track (defaults to the containing `album`'s if unspecified)
+* `markers`: An array of markers to indicate different sections of a track, such as movements, chapters, or other similar metadata. Each array element contains the following properties:
 
-Note that `disc` and `track` are purely for display purposes, and do not affect the natural playback order of the track, which is given by the order of the `track` elements within the containing entity's `children`.
+    * `timestamp`: The time, in seconds, that the marker appears (relative to the start of the track); **required**
+    * `label`: The label of the marker; **required**
+    * `type`: The type of marker, for example, `movement`, `section`, `chapter`, `index`, etc.
 
 An example track might look like:
 
@@ -218,6 +223,19 @@ An example track might look like:
         "duration": 120,
         "size": 384198472,
         "comment": "music video"
+    }],
+    "markers": [{
+        "timestamp": 0,
+        "type": "movement",
+        "label": "Adagio"
+    }, {
+        "timestamp": 15,
+        "type": "movement",
+        "label": "Rondo - Vivace"
+    }, {
+        "timestamp": 30.7,
+        "type": "movement",
+        "label": "Larghetto i risoluzione"
     }]
 }
 ```
