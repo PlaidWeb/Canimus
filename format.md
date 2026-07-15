@@ -77,7 +77,7 @@ The following attributes apply to all types of entity:
 
 * `$type`: The type of entity being defined; **required**
 * `$id`: An opaque, permanent string identifier to uniquely identify this entity relative to this collection; **strongly recommended**
-* `$items`: A list of entities that are contained by this entity
+* `$items`: A list of items that are contained by this entity; an item may be another entity, or an [entity reference](#entity-reference)
 * `$lang`: The default [localization](#localization) for display strings; defaults to the language of the containing element
 * `url`: The canonical [URL](#url) for an HTML representation of the current entity, e.g. the webpage for the label/artist/release/track
 * `name`: The common name of the entity
@@ -105,9 +105,9 @@ The following attributes apply to all types of entity:
     * `contentType`: The MIME content type of the image (e.g. `image/png`, `image/jpeg`, `image/webp`); **strongly recommended**
     * `alternates`: An array of alternate formats, each a dictionary of properties the same as above (excepting `alternates`)
 
-* `summary`: A short description of the entity, intended to be one single line of plain text.
-* `description`: A longer description of the entity, formatted as HTML, to be sanitized by the consumer.
-* `relationship`: A brief explanation of how this entity is related to its containing entity; this is typically only used in an [entity reference](#entity-reference).
+* `summary`: A short description of the entity, intended to be one single line of plain text
+* `description`: A longer description of the entity, formatted as [description Markdown](#description-text)
+* `relationship`: A brief explanation of how this entity is related to its containing entity; this is typically only used in an [entity reference](#entity-reference)
 
 * `links`: Associated links; stored as an array of property dictionaries, each of which includes the following attributes:
     * `name`: The display name of the link; **required**
@@ -131,7 +131,7 @@ The following attributes apply to all types of entity:
 
 Many properties refer to items that may appear at multiple points in a collection. For example, a release may refer to multiple artists, and it may be desirable to only define the artist once in the collection. Similarly, it is possible for a track to appear in multiple releases, for example in a best-of compilation or similar.
 
-A reference is formed by declaring an item with a `$ref` that matches the `$id` of the original item. Any additional properties will override those from the original `$id` without affecting the original. As such, a `$ref` **cannot** have an `$id` or `$type` property.
+A reference is formed by declaring an item with a `$ref` that matches the `$id` of the original entity. Any additional properties will override those from the original `$id` without affecting the original, essentially modifying a copy. An entity reference **must not** have `$id` or `$type` attributes.
 
 A basic example follows:
 
@@ -161,6 +161,7 @@ A basic example follows:
                     "$ref": "hit-single",
                     "name": "Hit Single (original mix)"
                 }, {
+                    "$type": "track",
                     "$id": "hit-single-remix",
                     "name": "Hit Single (Bayside Boys Mix)",
                 }],
@@ -246,6 +247,40 @@ function getAttributeLocalized(element, attribute, locale) {
     return element[attribute]
 }
 ```
+
+### <span id="markdown">Limited Markdown</span>
+
+Longer text, such as the `description` attribute, may benefit from a rich text presentation. To this end, display clients such as players **should** render these text fields as [Markdown](https://markdown.org/). The recommended Markdown subset varies by context.
+
+Raw HTML tags ***must not*** be supported; in contexts where the text display is being handled by an HTML renderer (such as in a browser or embedded WebView), entities **must** be encoded (for example, converting the text `<hello>` to the HTML `&lt;hello&gt;`).
+
+#### <span id="description-text">Descriptions</span>
+
+In descriptions, the following markup types **must** be supported:
+
+* Paragraphs
+
+and the following **should** be supported:
+
+* Emphasis
+* Headings
+* Lists
+* Links
+* Quotes
+* Code (both inline and fenced/indented blocks)
+
+However, the definition of "supported" is up to the discretion of the implementer; for example, it is totally valid for an implementation to render it as plain text, or to render links as just the link text (e.g. rendering `[Hello](https://youtu.be/dQw4w9WgXcQ)` as just the string `Hello`).
+
+For the purpose of security, it is not recommended that clients support full or extended Markdown syntax; for example, images, tables, and footnotes **should not** be supported. It is up to the implementation as to whether these facets are stripped out or if they're displayed as the raw text string.
+
+#### <span id="lyric-text">Lyrics</span>
+
+In lyrics, the following markup types **should** be supported:
+
+* Emphasis
+* Inline code
+
+However, it is valid for an implementation to only lyric text as the raw string.
 
 ## <span id="collection">Collection</span>
 
@@ -346,12 +381,12 @@ It has the following additional properties:
 * `copyright`: The copyright information of the album (defaults to the containing [`release`](#release)'s)
 * `license`: Any additional license information, e.g. `"CC by-nc-sa"` (defaults to the containing [`release`](#release)'s)
 
-* `lyrics`: The human-readable, non-synchronized lyrics of the track, if any; this should be provided as plain text with a single `\n` between lines, and `\n\n` between verses. Limited Markdown (such as `*emphasis*` and `**boldface**`) **may** be supported at the discretion of the consumer.
+* `lyrics`: The human-readable, non-synchronized lyrics of the track, if any; this should be provided as plain text with a single `\n` between lines, and `\n\n` between verses. [Lyric Markdown](#lyric-text) (such as `*emphasis*` and `**boldface**`) **may** be supported at the discretion of the consumer.
 * `synchronizedLyrics`: Synchronized lyrics, given as a list of elements with the following properties:
     * `startTime`: The start time of the lyric, in seconds; **required**
     * `endTime`: The end time of the lyric in seconds; **strongly recommended**
     * `voice`: The name of the voice that is singing/stating the lyric; this **should** be human-readable, and **must** be consistent throughout the track
-    * `text`: The representative text of the lyric
+    * `text`: The representative text of the lyric, in [lyric Markdown](#lyric-text); **required**
     * `color`: A recommended color for the display of the lyric, given as a common color name or hex code
 
     Note that lyrics may overlap (such as in the case of duets or staggered vocals).

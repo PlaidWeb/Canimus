@@ -37,7 +37,8 @@
                     "url": "https://example.band/track/hit-single",
                     "duration": 245,
                     "genre": "Rock",
-                    "lyrics": "This is a song\nIt is not very long\nWould you please listen\nTo this silly song",
+                    "description": "This song was a hit single on the [Blibbored Top 50](https://example.com/blibboredtop50) for three hours in 2016",
+                    "lyrics": "This is a song\nIt is not very long\nWould you *please* listen\nTo this silly song",
                     "synchronizedLyrics": [
                         {
                             "startTime": 17,
@@ -52,7 +53,7 @@
                         {
                             "startTime": 28,
                             "endTime": 29.2,
-                            "text": "Would you please listen"
+                            "text": "Would you *please* listen"
                         },
                         {
                             "startTime": 29.7,
