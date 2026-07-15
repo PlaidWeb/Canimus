@@ -38,15 +38,17 @@ Attributes with a name of `$comment` are allowed anywhere for documentation purp
 
 ### Dates and times
 
-<span id="datetime">Datetimes</span> are represented as strings in `YYYY[-MM[-DD[ hh:mm[:ss][+ZZZZ]]]]` format. For example, `2026-06-14 14:42-0700` is equivalent to June 14, 2026 at 2:42 PM in Pacific Daylight Time.
+<span id="datetime">Datetimes</span> are represented as strings in `YYYY[-MM[-DD[ hh:mm[:ss][+ZZZZ]]]]` format. For example, `2026-06-14 14:42-0700` is equivalent to June 14, 2026 at 2:42 PM in UTC-0700 (e.g. Pacific Daylight Time).
 
-If a given time lacks timezone information, it will be assumed to be UTC; `14:06:02`, `14:06:02Z`, and `14:06:02+0000` are therefore equivalent.
+If a given time lacks timezone information, it will be assumed to be UTC; `14:06:02` and `14:06:02+0000` are therefore equivalent.
 
 A consumer **should** make use of all available precision, but it is not specified how it treats varying levels of precision; for example:
 
 * It is not specified how `2026-06-14 12:34`, `2026-06-14`, `2026-06`, and `2026` sort relative to one another
 * `2026-06` must always come before `2026-05`
-* 2026-06 must always come after 2026-05-30
+* `2026-06` must always come after `2026-05-30`
+
+Per the above, dates may be trivially sorted and filtered lexically, but fully-specified datetimes need to be timezone-aware.
 
 <span id="duration">Durations</span> are given numerically as seconds in floating-point format. A duration of `123.45` means 123 seconds and 450 milliseconds.
 
