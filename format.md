@@ -180,7 +180,9 @@ If a `$ref` appears, its corresponding `$id` ***must*** appear in the same Choru
 
 Any displayable string (name, description, etc.) will be assumed to be in the `$lang` of its container, propagating upwards. As such, it is **strongly recommended** that the top-level entity provide a `$lang`.
 
-Language codes are given by [RFC 5646](https://datatracker.ietf.org/doc/rfc5646/) (e.g. `en` for English, `en-US` for specifically US English).
+Localization follows the [IETF BCP 47](https://www.rfc-editor.org/info/bcp47) standard.
+
+Language codes are defined by [RFC 5646](https://datatracker.ietf.org/doc/rfc5646/) (e.g. `en` for English, `en-US` for specifically US English).
 
 Alternate localizations are given by appending `$code` to the attribute name; for example:
 
@@ -194,6 +196,54 @@ Alternate localizations are given by appending `$code` to the attribute name; fo
 ```
 
 Even if a string is fully localized, it **must** still provide a version without a locale suffix, as localization is considered optional.
+
+#### Lookup algorithm
+
+The lookup algorithm is defined by [RFC 4647](https://datatracker.ietf.org/doc/rfc4647/). Namely, localized strings must be looked up based on exact matches, from most specific to least; for example, if the attribute `name` is requested in locale `en-US`, then the attribute should be looked up as `name$en-US`, `name$en`, and then finally `name`. A locale of `en-US` shall never receive a string for `en-UK`.
+
+For example, with the following strings:
+
+```json
+{
+    "summary": "Default",
+    "summary$en-UK": "Colour",
+    "summary$en-US": "Color",
+}
+```
+
+a lookup of the attribute `summary` in locale `en-AU` will return `"Default"`.
+
+Sample implementations for attribute lookup are as below.
+
+```python
+# Python implementation
+def get_string_localized(element:dict, attribute:str, locale:str=None):
+    if locale:
+        tags = locale.split('-')
+        while tags:
+            key = f"{attribute}${'-'.join(tags)}"
+            if key in element:
+                return element[key]
+            tags.pop()
+    return element.get(attribute)
+```
+
+```js
+// JavaScript implementation
+function getStringLocalized(element, attribute, locale) {
+    if (locale) {
+        var tags = locale.split('-')
+        while (tags.length) {
+            key = `${attribute}\$${tags.join('-')}`
+            if (element[key]) {
+                return element[key];
+            }
+            tags.pop();
+        }
+    }
+    return element[attribute]
+}
+```
 
 ## <span id="collection">Collection</span>
 
