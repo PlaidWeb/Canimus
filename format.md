@@ -43,8 +43,7 @@ If a given time lacks timezone information, it will be assumed to be UTC; `14:06
 A consumer **should** make use of all available precision, but it is not specified how it treats varying levels of precision; for example:
 
 * It is not specified how `2026-06-14 12:34`, `2026-06-14`, `2026-06`, and `2026` sort relative to one another
-* `2026-06` must always come before `2026-05`
-* `2026-06` must always come after `2026-05-30`
+* `2026-06` must always come after `2026-05` and `2026-05-30`
 
 Per the above, dates may be trivially sorted and filtered lexically, but fully-specified datetimes need to be timezone-aware.
 
