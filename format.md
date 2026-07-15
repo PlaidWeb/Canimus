@@ -4,8 +4,6 @@ A Chorus collection is formatted as structured data, provided in a commonly-pars
 
 JSON is likely the simplest to implement and to build validation tools for, as most current web frameworks and languages already have direct first-class support for JSON. However, other formats such as XML and YAML are also plausible and should be considered. The document **must** be encoded as UTF-8, unless the serialization format has a means of specifying an alternate encoding.
 
-The top-level element **should** be of type [`collection`](#collection).
-
 For the sake of this document, the assumption will be that the data is serialized in JSON format.
 
 ## Discovery
@@ -178,7 +176,7 @@ A basic example follows:
 
 If a `$ref` appears, its corresponding `$id` ***must*** appear in the same Chorus document.
 
-### Localization
+### <span id="localization">Localization</span>
 
 Any displayable string (name, description, etc.) will be assumed to be in the `$lang` of its container, propagating upwards. As such, it is **strongly recommended** that the top-level entity provide a `$lang`.
 
@@ -194,6 +192,8 @@ Alternate localizations are given by appending `$code` to the attribute name; fo
     "name$jp": "これが私の名前です"
 }
 ```
+
+Even if a string is fully localized, it **must** still provide a version without a locale suffix, as localization is considered optional.
 
 ## <span id="collection">Collection</span>
 
