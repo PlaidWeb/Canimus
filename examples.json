@@ -42,22 +42,22 @@
                     "synchronizedLyrics": [
                         {
                             "startTime": 17,
-                            "endTime": 20,
+                            "duration": 1.5,
                             "text": "This is a song"
                         },
                         {
                             "startTime": 22.5,
-                            "endTime": 27,
+                            "duration": 2.25,
                             "text": "It is not very long"
                         },
                         {
                             "startTime": 28,
-                            "endTime": 29.2,
+                            "duration": 2.3,
                             "text": "Would you *please* listen"
                         },
                         {
                             "startTime": 29.7,
-                            "endTime": 31,
+                            "duration": 5,
                             "text": "To this silly song"
                         }
                     ],
@@ -80,9 +80,12 @@
                     },
                     "$items": [
                         {
+                            "$comment": "This track is available en Español",
                             "$type": "track",
                             "name": "First track",
+                            "name$es": "Canción primera",
                             "url": "https://example.band/track/first-track",
+                            "duration": 290.6,
                             "media": [
                                 {
                                     "contentType": "audio/mp3",
@@ -97,7 +100,9 @@
                                     "size": 7521923,
                                     "$comment": "Versión en español"
                                 }
-                            ]
+                            ],
+                            "lyrics": "I'm not sure what your problem is\nBut I think you might be right",
+                            "lyrics$es": "No sé cuál es tu problema,\nPero creo que podrías tener razón"
                         },
                         {
                             "$type": "track",

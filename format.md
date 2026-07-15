@@ -34,9 +34,9 @@ Attribute names are to be given in English and written in `camelCase` (first let
 
 Attributes with a name of `$comment` are allowed anywhere for documentation purposes; attributes with this name **must** be ignored by receivers and **must not** be used in any future revisions to the specification.
 
-### Dates and times
+### <span id="datetime">Dates and times</span>
 
-<span id="datetime">Datetimes</span> are represented as strings in `YYYY[-MM[-DD[ hh:mm[:ss][+ZZZZ]]]]` format. For example, `2026-06-14 14:42-0700` is equivalent to June 14, 2026 at 2:42 PM in UTC-0700 (e.g. Pacific Daylight Time).
+Dates and times are represented as strings in `YYYY[-MM[-DD[ hh:mm[:ss][+ZZZZ]]]]` format. For example, `2026-06-14 14:42-0700` is equivalent to June 14, 2026 at 2:42 PM in UTC-0700 (e.g. Pacific Daylight Time).
 
 If a given time lacks timezone information, it will be assumed to be UTC; `14:06:02` and `14:06:02+0000` are therefore equivalent.
 
@@ -47,7 +47,11 @@ A consumer **should** make use of all available precision, but it is not specifi
 
 Per the above, dates may be trivially sorted and filtered lexically, but fully-specified datetimes need to be timezone-aware.
 
-<span id="duration">Durations</span> are given numerically as seconds in floating-point format. A duration of `123.45` means 123 seconds and 450 milliseconds.
+### <span id="duration">Durations</span> and <span id="timestamps">timestamps</span>
+
+Durations and timestamps are given numerically as seconds, and **must** be serialized as a number. So, for example, a duration of 1 hour, 23 minutes, and 45.6 seconds is serialized as the number `5025.6`.
+
+A timestamp is relative to the start time of the respective media.
 
 ### <span id="url">URLs</span>
 
@@ -382,15 +386,13 @@ It has the following additional properties:
 
 * `lyrics`: The human-readable, non-synchronized lyrics of the track, if any; this should be provided as plain text with a single `\n` between lines, and `\n\n` between verses. [Lyric Markdown](#lyric-text) (such as `*emphasis*` and `**boldface**`) **may** be supported at the discretion of the consumer.
 * `synchronizedLyrics`: Synchronized lyrics, given as a list of elements with the following properties:
-    * `startTime`: The start time of the lyric, in seconds; **required**
-    * `endTime`: The end time of the lyric in seconds; **strongly recommended**
+    * `startTime`: The starting [timestamp](#timestamp) of the lyric; **required**
+    * `duration`: The [duration](#duration) of the lyric; **strongly recommended**
     * `voice`: The name of the voice that is singing/stating the lyric; this **should** be human-readable, and **must** be consistent throughout the track
     * `text`: The representative text of the lyric, in [lyric Markdown](#lyric-text); **required**
     * `color`: A recommended color for the display of the lyric, given as a common color name or hex code
 
-    Note that lyrics may overlap (such as in the case of duets or staggered vocals).
-
-    If `endTime` is not given, it is up to the implementation to decide a reasonable duration for the lyric to be displayed.
+    Note that lyrics may overlap (such as in the case of duets or staggered multi-part vocals).
 
 * `genre`: An arbitrary string of text that may indicate vaguely what sorts of people might like this track (defaults to the containing `release`'s if unspecified)
 * `markers`: An array of markers to indicate different sections of a track, such as movements, chapters, or other similar metadata. Each array element contains the following properties:
