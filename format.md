@@ -38,7 +38,7 @@ Attributes with a name of `$comment` are allowed anywhere for documentation purp
 
 ### Dates and times
 
-<span id="datetime">Datetimes</span> are represented as strings in `YYYY[-MM[-DD]][ hh[:mm[:ss][+ZZZZ]]]` format. For example, `2026-06-14 14:42-0700` is equivalent to June 14, 2026 at 2:42 PM in Pacific Daylight Time.
+<span id="datetime">Datetimes</span> are represented as strings in `YYYY[-MM[-DD[ hh:mm[:ss][+ZZZZ]]]]` format. For example, `2026-06-14 14:42-0700` is equivalent to June 14, 2026 at 2:42 PM in Pacific Daylight Time.
 
 If a given time lacks timezone information, it will be assumed to be UTC; `14:06:02`, `14:06:02Z`, and `14:06:02+0000` are therefore equivalent.
 
