@@ -8,7 +8,7 @@ Music discovery, consumption, and streaming is locked down by large corporations
 
 There are several disparate attempts to build a better world for musicians, but many of them are built on protocols that were not designed for this use case in mind. ActivityPub and RSS were simply not designed with the specific needs of distribution and discovery of musical content, and most of the existing attempts are built on top of those.
 
-Chorus is an attempt to build a lightweight syndication protocol that anyone can join in on, and which provides the much-needed structure for subscribing to musicians' streaming content in a way that enables fair payments, while also being Web-native.
+Chorus is a lightweight syndication protocol that anyone can join in on, and which provides the much-needed structure for subscribing to musicians' streaming content in a way that enables fair payments, while also being Web-native.
 
 This is an expansion on the ideas stated in "[A fair independent streaming platform](https://beesbuzz.biz/blog/11155-A-fair-independent-streaming-platform)."
 
@@ -20,7 +20,7 @@ Canimus feeds were initially provided as a proof-of-concept by [Sockpuppet](http
 
 While Canimus was a good starting point, over time several deficiencies led to the need to overhaul key aspects of it, and this was a good opportunity to change the name, as well.
 
-While "Chorus" as a name is simply in reference to independent musicians making and sharing music together, semi-officially it has a backronym of "Corporate Hell Or Us."
+While "Chorus" as a name is a reference to independent musicians making and sharing music together, it has a casual backronym of "Corporate Hell Or Us."
 
 ## Glossary
 
