@@ -2,9 +2,9 @@
 
 This document describes some of the considerations in place for implementing a receiver. It is meant to be descriptive, not prescriptive.
 
-## Feed subscriptions
+## Subscriptions
 
-Generally-speaking, the player should periodically refresh the feeds that it has knowledge of at some regular interval, as well as supporting [WebSub](https://en.wikipedia.org/wiki/WebSub) for immediate "pings" when an update takes place.
+Generally-speaking, the player should periodically refresh the collections that it has knowledge of at some regular interval, as well as supporting [WebSub](https://en.wikipedia.org/wiki/WebSub) for immediate "pings" when an update takes place.
 
 If a feed or its content disappears in some way other than being explicitly deleted, it should be up to the player to handle this in a graceful manner. For example, content which has just gone offline should be listed as "temporarily unavailable," and then after a certain period of unavailability it could be removed.
 
@@ -26,15 +26,15 @@ The HTTP `Accept` header declares which feed protocols you accept and prefer, an
 
 A good starting point header value, for clients which only can parse the JSON feed format, might be:
 
-    Accept: application/canimus+json, application/json, */*;q=0.5
+    Accept: application/chorus+json, application/json;q=0.75, */*;q=0.1
 
-If you can also parse YAML, then you would do:
+If you can also parse YAML, then you could do:
 
-    Accept: application/canimus+json, application/json, application/yaml, */*;q=0.5
+    Accept: application/chorus+json, application/chorus+yaml, application/json;q=0.75, application/yaml;q=0.5, */*;q=0.1
 
 And so on.
 
-This allows the server to select the appropriate protocol to send back, in the event that it supports multiple protocols. Notably, this also allows implementations to provide a human-readable HTML fallback if no particular content-type is requested, which is a better user experience in general.
+This allows the server to select the appropriate format to send back, in the event that it supports multiple protocols. Notably, this also allows implementations to provide a human-readable HTML fallback if no particular content-type is requested, which is a better user experience in general.
 
 ### Caching and avoiding over-updating
 
@@ -50,7 +50,7 @@ Here is Python stub code for how to implement all of the above, using [requests]
 def update_feed(feed_url, last_response_headers):
     headers = {
         'User-Agent': 'ExamplePlayer/1.2; +https://example.com/player/about.html',
-        'Accept': 'application/canimus+json, application/json;q=0.9, */*;q=0.5'
+        'Accept': 'application/chorus+json, application/json;q=0.9, */*;q=0.5'
     }
     if last_response_headers and 'ETag' in last_response_headers:
         headers['If-None-Match'] = last_response_headers['ETag']
@@ -62,7 +62,7 @@ def update_feed(feed_url, last_response_headers):
     if r.status == 304: # Not Modified
         return
 
-    # otherwise, process the feed. Remember to store r.headers for later!
+    # Otherwise, process the feed. Remember to store r.headers for later!
 ```
 
 And here is a similar implementation in Javascript/node:
@@ -72,7 +72,7 @@ async function updateFeed(feedUrl, lastResponseHeaders) {
     const request = await fetch(feedUrl, {
         headers: {
             'User-Agent': 'ExamplePlayer/1.2; +https://example.com/player/about.html',
-            'Accept': 'application/canimus+json, application/json;q=0.9, */*;q=0.5'
+            'Accept': 'application/chorus+json, application/json;q=0.9, */*;q=0.5'
             'If-None-Match': lastResponseHeaders['Last-Modified'],
             'If-Modified-Since': lastResponseHeaders['ETag']
         }
@@ -100,7 +100,7 @@ One of the ways that the major commercial streaming platforms acquired their ear
 
 Rather than requiring that people upload their (often gigantic) collections to a server somewhere and the copyright nightmares that would entail, one possible mechanism would be for the player engines to allow people to self-host their own collection, possibly using a service that they run from their home network (akin to Plex or Jellyfin, and this could even be built as a plugin for those platforms).
 
-This is an implementation detail of the receiver, but one basic suggestion would be for users to be able to run a simple media server that presents a Canimus feed to their collection and requires some simple authentication path between this collection and the receiver, e.g. an API token or HTTP basic auth credentials.
+This is an implementation detail of the receiver, but one basic suggestion would be for users to be able to run a simple media server that presents a Chorus feed to their collection and requires some simple authentication path between this collection and the receiver, e.g. an API token or HTTP basic auth credentials.
 
 The music listened to on these private libraries should lead to public recommendation and discovery data, but the private library content itself should not be made accessible to other users of the same receiver or the network in general. Individual users *may* be able to invite others to connect to their collection, but the burden is then on them to deal with whatever copyright-related issues this presents.
 
@@ -116,4 +116,4 @@ Listeners should be able to provide a profile of the music they are listening to
 
 This information could be used to build a per-player recommendation database, and possibly allow listeners to subscribe to each other as a form of peer-to-peer discovery and recommendation.
 
-One possible means of formatting the feed is as a Canimus feed with a `scrobble` entity (which would in turn build on `playlist`), but it could also be provided in other formats for compatibility with other services (Libre.fm, ListenBrainz, etc.)
+One possible means of formatting the feed is as a Chorus feed with a `scrobble` entity (which would in turn build on `playlist`), but it could also be provided in other formats for compatibility with other services (Libre.fm, ListenBrainz, etc.)

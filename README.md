@@ -1,19 +1,6 @@
-# Canimus
+# Chorus
 
-Canimus is a syndication format to allow for federated discovery of streamable music in a platform-agnostic manner.
-
-Canimus is the Latin first-person plural progressive form of [canō](https://en.wiktionary.org/wiki/cano#Latin), which has several meanings:
-
-* We sing
-* We play
-* We make sound
-* We chant
-* We resound
-* We prophesize
-
-Or, in short, *we make music*.
-
-That said, [the name could be better](https://github.com/PlaidWeb/Canimus/issues/12).
+Chorus is a lightweight syndication format to allow for federated music discovery and streaming in a platform- and distribution-agnostic manner.
 
 ## Rationale
 
@@ -21,24 +8,34 @@ Music discovery, consumption, and streaming is locked down by large corporations
 
 There are several disparate attempts to build a better world for musicians, but many of them are built on protocols that were not designed for this use case in mind. ActivityPub and RSS were simply not designed with the specific needs of distribution and discovery of musical content, and most of the existing attempts are built on top of those.
 
-Canimus is an attempt to build a lightweight syndication protocol that anyone can join in on, and which provides the much-needed structure for subscribing to musicians' streaming content in a way that enables fair payments, while also being Web-native.
+Chorus is an attempt to build a lightweight syndication protocol that anyone can join in on, and which provides the much-needed structure for subscribing to musicians' streaming content in a way that enables fair payments, while also being Web-native.
 
 This is an expansion on the ideas stated in "[A fair independent streaming platform](https://beesbuzz.biz/blog/11155-A-fair-independent-streaming-platform)."
+
+## History
+
+A previous iteration of the protocol was called "Canimus," which is the first-person plural progressive conjugation of the Latin word [canō](https://en.wiktionary.org/wiki/cano#Latin), roughly meaning "we make music."
+
+Canimus feeds were initially provided as a proof-of-concept by [Sockpuppet](https://sockpuppet.band/), [Song Fight!](https://songfight.org/), and [Mirlo](https://mirlo.space), and a few consumers implemented support for it, including [Fairplayer](https://fairplayer.band/).
+
+While Canimus was a good starting point, over time several deficiencies led to the need to overhaul key aspects of it, and this was a good opportunity to change the name, as well.
+
+While "Chorus" as a name is simply in reference to independent musicians making and sharing music together, semi-officially it has a backronym of "Corporate Hell Or Us."
 
 ## Glossary
 
 The following terms are used to describe the different parts of the system:
 
 * **publisher**: A source of data into the network, such as a website operated by an independent artist or a music label
-* **receiver**: A system that subscribes to and aggregates Canimus collections as a backing storage for a player
+* **receiver**: A system that subscribes to and aggregates Chorus collections as a backing storage for a player
 * **player**: The user-facing interface that is used to browse and listen to music known by a receiver
 
 ## Documents
 
 For more detailed information on each part of the system, please consult the following sub-documents:
 
-* [format](format.md): Defines the Canimus data format
-* [receiver](receiver.md): Defines (broadly) how a receiver may consume Canimus data
+* [format](format.md): Defines the Chorus data format
+* [receiver](receiver.md): Defines (broadly) how a receiver may consume Chorus data
 * [payments](payments.md): Defines (broadly) some ideas for how musicians may be supported in the network
 * [examples](examples.json): An example feed demonstrating several different use cases
 
@@ -52,7 +49,7 @@ Much of the metadata for the items *tends* to be consistent across an entire col
 
 Most current formats also exist to present new content in a stream of ephemera, without much attention given to older items.
 
-The Canimus format attempts to encapsulate a collection of music, which can be browsed, revisited, and categorized, while also taking advantage of the overall structure of an album as a sequential series of related songs, without necessarily being limited to that structure.
+The Chorus format attempts to encapsulate a collection of music, which can be browsed, revisited, and categorized, while also taking advantage of the overall structure of an album as a sequential series of related songs, without necessarily being limited to that structure.
 
 This format is also intended to be easy to publish and to parse, without any guesswork about what anything actually means. Musicians shouldn't have to sign up for every new distributed platform that springs up, when those platforms could subscribe to a common format as one potential source for music. They should be able to just add it as a format to publish their music to the web in a way that is, hopefully, easy to adapt into other ecosystems.
 
@@ -70,7 +67,7 @@ None of these issues are insurmountable, and if consensus can be built on an ext
 
 ### Why not ActivityPub?
 
-There are several ActivityPub-based music federation projects underway as well. ActivityPub is a great format for pushing out notifications of new content to be sure, and Canimus could indeed be implemented as a layer on top of ActivityPub. However, the promise of ActivityPub is having a universal client/server for realtime updates, and similarly to RSS, is not suitable for providing a browseable collection of specifically-structured data. Most ActivityPub implementations are also oriented towards the idea of two-way communication between client and server, and this is anathema to the notion of a collection being published to a static hosting provider or similar, and also requires a lot of active (and fragile) state to be maintained between the two.
+There are several ActivityPub-based music federation projects underway as well. ActivityPub is a great format for pushing out notifications of new content to be sure, and Chorus could indeed be implemented as a layer on top of ActivityPub. However, the promise of ActivityPub is having a universal client/server for realtime updates, and similarly to RSS, is not suitable for providing a browseable collection of specifically-structured data. Most ActivityPub implementations are also oriented towards the idea of two-way communication between client and server, and this is anathema to the notion of a collection being published to a static hosting provider or similar, and also requires a lot of active (and fragile) state to be maintained between the two.
 
 Any implementation of a music collection on top of ActivityPub would still have to implement the collection itself, and maintain standards for how backfilling works and how the collection is shaped, so why not start with a clean implementation that only provides the parts that are important to a music collection to begin with?
 
@@ -82,23 +79,35 @@ Additionally, parsing and presenting microformats can be a lot more complicated 
 
 As such, while microformats are a very nice approach in theory, the practical concerns make it not very compelling for this use case.
 
+Additionally, it presents multiple performance issues; since all of the data is embedded into the page which the data is about, you have to either embed a complte catalog into the root page of a website (which vastly increases the page retrieval overhead for everyone, including mobile web users), or clients need to do a full tree walk in order to find updates to items, and there is no clear mechanism for signifying whether a dependency has to be retrieved. This could be worked around by adding an optional content hash to every linked item, but that increases the complexity for both publishers and consumers.
+
+Microformats also tend to make use of the page URL as the identifier, which adds difficulty to the process of reconciling URL changes. Microformats do support a `p-uid` property which can be used to reconcile this, but it isn't widely supported.
+
+Also, since every entity must be visible, that does not allow for things like feed-only content.
+
+### Why not JSON-LD?
+
+JSON-LD is meant to work similarly to microformats, with a large JSON blob embedded into a webpage. While this works well for discovery, it has major performance issues for actual data ingestion. Your choices are either to embed a complete catalog into the webpage for the root entity (which slows down every single webpage retrieval unnecessarily), or requires linking the data across webpages per entity and having consumers do a full tree walk, which in turn requires retrieving basically every webpage on a site in order to get the latest information, as there is no standard mechanism for indicating whether a dependency has changed.
+
+JSON-LD is also far less efficient than microformats, as the embedding structure is parallel to the webpage itself, and in many cases has significantly more overhead than the microformats markup.
+
+Additionally, JSON-LD uses the entity's URL as its identifier, which vastly complicates things when it comes to changing the URL of an item, which can happen when a webpage gets reorganized or if an item changes its name.
+
+Also, since every entity must be visible, that does not allow for things like feed-only content.
+
 ### What about [missing feature]?
 
 The specification in its current form is certainly not the final word, and can and should be extended as use cases are uncovered. Every attempt has been made to keep it extensible and flexible, but of course there will be things that are missing as well.
 
-That is why this is hosted as a git repository with [issues](https://github.com/PlaidWeb/Canimus/issues) and [discussions](https://github.com/PlaidWeb/Canimus/discussions).
+### Why should something use Chorus instead of anything else?
 
-This is a starting point for something better than what exists currently.
-
-### Why should something use Canimus instead of anything else?
-
-It shouldn't! Different formats are good at different things. Canimus is meant to live alongside other protocols, and it purposefully excludes functionality other than sharing music. There is no intention to add any functionality like real-time status posts, blog entries, or podcasts, all of which are served better by social feed formats such as RSS and Atom.
+It shouldn't! Different formats are good at different things. Chorus is meant to live alongside other protocols, and it purposefully excludes functionality other than publishing music. There is no intention to add any functionality like real-time status posts, blog entries, or podcasts, all of which are served better by social feed formats such as RSS and Atom.
 
 It is also not meant to be an encyclopedic compendium of all music; this is not a replacement to MusicBrainz, for example, although the end-user's software interoperating with MusicBrainz as a source of ground truth for metadata is certainly desirable.
 
-From a publisher's standpoint, Canimus is just another template to add to a website, to make it easier for music to be discovered and listened to.
+From a publisher's standpoint, Chorus is just another template to add to a website, to make it easier for music to be discovered and listened to.
 
-From a player's standpoint, Canimus is just another means of obtaining a collection of music.
+From a player's standpoint, Chorus is just another means of obtaining a collection of music.
 
 Nothing about this is exclusive; it's just meant to be simpler to support on both sides.
 
@@ -106,10 +115,10 @@ Nothing about this is exclusive; it's just meant to be simpler to support on bot
 
 Access control is generally better-served at a different level on a content delivery stack than the end format.
 
-The intention is that a Canimus collection, by default, provides that which the musician wants to be listened to, at whatever quality level makes the most sense for what is essentially a free preview.
+The intention is that a Chorus collection, by default, provides that which the musician wants to be listened to, at whatever quality level makes the most sense for what is essentially a free preview.
 
 The hope is that there will eventually be a standard mechanism for allowing receivers to manage access tokens in order to fetch full-quality versions or bonus content and the like (with the same mechanism preventing someone from simply republishing the underlying media URLs unprotected). This can take many forms, such as [standard HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Authentication) (particularly bearer tokens) or something OAuth-based, but the ideal long-term goal is that people would use this as a mechanism to find music to purchase and download into their own local collections.
 
-That local collection could then be served up in turn as a private Canimus collection; there is some discussion about how that might work in the [receiver document](receiver.md#private).
+That local collection could then be served up in turn as a private Chorus collection; there is some discussion about how that might work in the [receiver document](receiver.md#private).
 
 The overall goal of this project is to turn listeners into collectors. The existence of music should not be contingent on the long-term durability of its hosting provider.

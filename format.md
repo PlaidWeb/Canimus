@@ -1,40 +1,95 @@
-# Canimus format
+# Chorus format
 
-A Canimus collection is formatted as structured data, provided in a commonly-parseable format that provides nested key-value pairs and arrays of data. Every hierarchical layer represents a single entity, which may contain other entities.
+A Chorus collection is formatted as structured data, provided in a commonly-parseable format that provides nested key-value pairs and arrays of data. Every hierarchical layer represents a single entity, which may contain other entities.
 
 A case can be made for embedding the data directly into webpages using [microformats](https://microformats.org/). However, quite a few of the existing systems for music distribution are implemented as single-page applications and do not offer server-side rendering, and for those existing systems it would be much easier for them to present the data via an API endpoint, for which there is no meaningful advantage to HTML+mf2 or the like. For this reason, it presents a much lower-friction path to having a structured feed format as the primary interchange format.
 
-JSON is likely the simplest to implement and to build validation tools for, as most current web frameworks and languages already have direct first-class support for JSON. However, other formats such as XML and YAML are also plausible and should be considered.
+JSON is likely the simplest to implement and to build validation tools for, as most current web frameworks and languages already have direct first-class support for JSON. However, other formats such as XML and YAML are also plausible and should be considered. The document **must** be encoded as UTF-8, unless the serialization format has a means of specifying an alternate encoding.
 
-For the sake of this document, the assumption will be that the data is serialized in JSON format, and that there is a standard for JSON discovery from the associated webpages, such as a `<link>`, for example:
+The top-level element **should** be of type [`collection`](#collection).
+
+For the sake of this document, the assumption will be that the data is serialized in JSON format.
+
+## Discovery
+
+In order for a Chorus document to be discoverable from a web resource, it **should** be advertised in the form of a relevant HTTP link.
+
+From an HTML or XML document this will most likely be a `<link>` tag, for example:
 
 ```html
-<link rel="alternate" type="application/canimus+json" href="/path/to/canimus.json">
+<link rel="alternate" type="application/Chorus+json" href="/path/to/Chorus.json">
 ```
 
-in the HTML `<head>`, and with a recommendation of also providing a [`Link:` HTTP response header](https://www.w3.org/wiki/LinkHeader).
+in the referring document's `<head>`.
+
+It is also recommended to provide a [`Link:` HTTP response header](https://www.w3.org/wiki/LinkHeader), and for clients to honor that response header in the event that `<link>` is not available or relevant.
+
+## Style guide
+
+### Attribute names
+
+All attributes are **optional** unless otherwise specified. Standard attribute names **must** be defined as appearing in `camelCase`.
+
+Attributes starting with a `$` refer to things that are structural to the document, while attributes without this prefix are descriptive of the element itself.
+
+Structural attribute names **must not** be reused by element attribute names; for example, an element **may not** define an attribute named `type`.
+
+Attribute names are to be given in English and written in `camelCase` (first letter of the first word lowercase, no separator between words, additional words capitalized). Embedded acronyms are treated as single words; so for example a theoretical attribute of "HTML AJAX Endpoint" would appear as `htmlAjaxEndpoint`.
+
+Attributes with a name of `$comment` are allowed anywhere for documentation purposes; attributes with this name **must** be ignored by clients and **must not** be used in any future revisions to the specification.
+
+### Dates and times
+
+<span id="datetime">Datetimes</span> are represented as strings in `YYYY[-MM[-DD]][ hh[:mm[:ss][+ZZZZ]]]` format. For example, `2026-06-14 14:42-0700` is equivalent to June 14, 2026 at 2:42 PM in Pacific Daylight Time.
+
+If a given time lacks timezone information, it will be assumed to be UTC; `14:06:02`, `14:06:02Z`, and `14:06:02+0000` are therefore equivalent.
+
+A consumer **should** make use of all available precision, but it is not specified how it treats varying levels of precision; for example:
+
+* It is not specified how `2026-06-14 12:34`, `2026-06-14`, `2026-06`, and `2026` sort relative to one another
+* `2026-06` must always come before `2026-05`
+* 2026-06 must always come after 2026-05-30
+
+<span id="duration">Durations</span> are given numerically as seconds in floating-point format. A duration of `123.45` means 123 seconds and 450 milliseconds.
+
+### <span id="url">URLs</span>
+
+URLs **should** be given as absolute by publishers; however, clients **must** treat all URLs as potentially-relative to the originating document.
+
+For example, if a document is at `https://example.com/chorus.json`, then a URL of `/foo.mp3` **must** be interpreted as `https://example.com/foo.mp3`, and a URL of `//cdn.example.com/bar.ogg` **must** be interpreted as `https://cdn.example.com/bar.ogg`.
+
+Example implementations of URL resolution in various languages:
+
+* JavaScript (including Node): [`URL()` constructor](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL)
+* Python: [`urllib.parse.urljoin`](https://docs.python.org/3/library/urllib.parse.html#urllib.parse.urljoin)
+* PHP: [`php-urljoin`](https://github.com/fluffy-critter/php-urljoin)
+
+
+### Forward compatibility
+
+As attributes may be added to the specification in the future, any unknown attribute **must** be discarded/ignored by any clients, and validators **must not** fail validation based on unknown attributes for a document that are written to a newer version of the specification than the validator. However, validators **may** issue a compatibility warning for unknown attributes.
+
+This concern also applies to semantic relationships, such as the `rel` of a link or a marker.
 
 ## Entity definitions
 
-These are the entities which can be defined by the collection.
-
-All attributes are **optional** unless otherwise specified. Attribute names **should** be rendered in all-lowercase and use underscores (`_`) for the word separator. This enables the most compatibility across languages and use cases.
+These are the entities which can be defined by the document.
 
 The following attributes apply to all types of entity:
 
-* `type`: The type of entity being defined; **required**
+* `$type`: The type of entity being defined; **required**
+* `$id`: An opaque, permanent string identifier to uniquely identify this entity relative to this collection; **strongly recommended**
+* `$items`: A list of entities that are contained by this entity
+* `$lang`: The default [localization](#localization) for display strings; defaults to the language of the parent element
+* `url`: The canonical [URL](#url) for an HTML representation of the current entity, e.g. the webpage for the label/artist/release/track
 * `name`: The common name of the entity
-* `url`: The canonical URL for an HTML representation of the current entity, e.g. the webpage for the label/artist/album/track
-* `uid`: An opaque, permanent string identifier to uniquely identify this entity relative to this collection; this defaults to `url` if not specified
 
-    At least one of `url` or `uid` is **required**
-
-* `release_date`: The original release date, in `YYYY-MM-DD` format; **strongly recommended**
-* `updated_date`: The date of the last update, in `YYYY-MM-DD` format
+* `releaseDate`: The original release date, as a [datetime](#datetime)
+* `updatedDate`: The most recent update, as a [datetime](#datetime)
 
     For both of these, partial dates are acceptable in the event that only the year or year and month are available.
 
-    For consistency, this should be serialized as a string even if the serialization format supports datetimes (e.g. YAML).
+    For consistency, this **should** be serialized as a string even if the serialization format natively supports datetimes (e.g. YAML).
 
 * `images`: A collection of images that are relevant to the display of the content. This is to be stored as a key-value dictionary, where the key is the type of image, and the value describes the image.
 
@@ -46,19 +101,20 @@ The following attributes apply to all types of entity:
 
     Each of these keys maps to a dictionary of properties, or an array of dictionaries, each of which include:
 
-    * `src`: The URL to retrieve the image from; **required**
+    * `src`: The [URL](#url) to retrieve the image from; **required**
     * `alt`: The accessibility alt-text of the image; **strongly recommended**
     * `width` and `height`: The nominal display sizes of the image; **strongly recommended**
-    * `type`: The MIME content type of the image (e.g. `image/png`, `image/jpeg`, `image/webp`); **strongly recommended**
+    * `contentType`: The MIME content type of the image (e.g. `image/png`, `image/jpeg`, `image/webp`); **strongly recommended**
     * `alternates`: An array of alternate formats, each a dictionary of properties the same as above (excepting `alternates`)
 
 * `summary`: A short description of the entity, intended to be one single line of plain text.
 * `description`: A longer description of the entity, formatted as HTML, to be sanitized by the consumer.
+* `relationship`: A brief explanation of how this entity is related to its containing entity; this is typically only used in an [entity reference](#entity-reference).
 
 * `links`: Associated links; stored as an array of property dictionaries, each of which includes the following attributes:
     * `name`: The display name of the link; **required**
-    * `href`: The target of the link; **required**
-    * `type`: The content-type of the link (e.g. `text/html`, `application/rss+xml`, etc.)
+    * `href`: The [URL](#url) target of the link; **required**
+    * `contentType`: The content-type of the link (e.g. `text/html`, `application/rss+xml`, etc.)
     * `rel`: The relationship of this link to the item. These include, but are not limited to:
         * `canonical`: The URL that is considered the canonical representation of this entity on the web
         * `this`: An alternate URL that is also trusted to represent this entity
@@ -71,171 +127,266 @@ The following attributes apply to all types of entity:
 
         Note that more link relationships may be added in the future as additional needs are identified; as such, a link with an unknown `rel` should be either ignored or collected as an "other" type.
 
-* `children`: A list of entities that are contained by this entity.
+* `related`: A list of entities which should be seen as related to this entity (for example, associated artists). These **should** include a `relationship` label.
 
 ### <span id="entity-reference">Entity references</span>
 
-Some property types may be a simple display string, or they may be a reference to another entity. In the case of an entity reference, it will be a property bag containing the following properties (all optional unless otherwise specified):
+Many properties refer to items that may appear at multiple points in a collection. For example, a release may refer to multiple artists, and it may be desirable to only define the artist once in the collection. Similarly, it is possible for a track to appear in multiple releases, for example in a best-of compilation or similar.
 
-* `uid`: The `uid` of the referenced entity
-* `name`: The display name within the context of the entity, e.g. to override the display name
-* `rel`: The relationship of this entity
-* `label`: A text label describing the relationship
+A reference is formed by declaring an item with a `$ref` that matches the `$id` of the original item. Any additional properties will override those from the original `$id` without affecting the original. As such, a `$ref` **cannot** have an `$id` or `$type` property.
 
-If the entity reference is given as a basic string, it will be interpreted as a `name` that overrides the natural default entity's.
+A basic example follows:
 
-If a `uid` is given, a matching entity **must** appear in the same Canimus document.
+```json
+{
+    "$type": "collection",
+    "$items": [
+        {
+            "$type": "artist",
+            "$id": "artist-001",
+            "name": "Artist Number 1",
+            "url": "https://example.com/example-artist-1",
+            "$items": [{
+                "$type": "release",
+                "$id": "debut-album",
+                "name": "Debut Album",
+                "$items": [{
+                    "$type": "track",
+                    "$id": "hit-single",
+                    "name": "Hit Single",
+                }]
+            }, {
+                "$type": "release",
+                "$id": "best-of",
+                "name": "Best-Of Collection",
+                "$items": [{
+                    "$ref": "hit-single",
+                    "name": "Hit Single (original mix)"
+                }, {
+                    "$id": "hit-single-remix",
+                    "name": "Hit Single (Bayside Boys Mix)",
+                }],
+                "related": [{
+                    "$ref": "debut-album",
+                    "relationship": "Original release"
+                }]
+            }]
+        }
+    ]
+}
+```
 
-While unlikely, it is theoretically possible for a circular reference to occur. Implementations will need to account for this, although the mechanism by which they do that is outside the scope of this document.
+If a `$ref` appears, its corresponding `$id` ***must*** appear in the same Chorus document.
 
-## Top level (root)
+### Localization
 
-The top-level entity should have a type of `root`. A `root` entity cannot be contained by other entities.
+Any displayable string (name, description, etc.) will be assumed to be in the `$lang` of its container, propagating upwards. As such, it is **strongly recommended** that the top-level entity provide a `$lang`.
 
-An older version of the specification called this `feed` and that should be accepted but considered deprecated.
+Language codes are given by [RFC 5646](https://datatracker.ietf.org/doc/rfc5646/) (e.g. `en` for English, `en-US` for specifically US English).
 
-The root entity can contain the following additional attributes:
+Alternate localizations are given by appending `$code` to the attribute name; for example:
 
-* `protocol`: Refers to the protocol of the file, i.e. `"Canimus"`
-* `version`: Refers to the base Canimus specification version in effect; this can be given as a tag or a commit hash within the [main Canimus repository](https://github.com/PlaidWeb/Canimus), e.g. `"v0.1.0"` or `"411bcce"`.
+```json
+{
+    "$lang": "en-US",
+    "name": "This is my name",
+    "name$es": "Este es mi nombre",
+    "name$jp": "これが私の名前です"
+}
+```
 
-* `deleted`: Items that have been explicitly removed from the collection, given as a list of property dictionaries which can uniquely identify the content; for example, it **must** contain at least one of `url` and `uid`, and **should** contain other identifying information such as `name`. Deleted items must not appear anywhere else in the collection.
+## <span id="collection">Collection</span>
+
+The top-level entity **should** have a type of `collection`. A `collection` entity cannot be contained by other entities.
+
+The `collection` entity can contain the following additional attributes:
+
+* `$protocol`: Refers to the protocol of the file, i.e. `"Chorus"`
+* `$version`: Refers to the base Chorus specification version in effect, e.g. "v0.2.5"
+* `$schema`: A URL to a JSON Schema reflective of the version of the protocol in use
+* `$deleted`: Items that have been previously published but are now removed from the collection, given as a list of `$id` values. These items **must not** appear anywhere else in the document, and furthermore **should** only appear if an item was previously published but is to be revoked.
 
 A collection supports the following additional link types, with the `rel` value set accordingly:
 
 * `websub`: A link to a [WebSub](https://en.wikipedia.org/wiki/WebSub) hub, where a receiver can subscribe to immediate updates to this collection
-* Links for pagination, as described in the following "Pagination" subsection.
+* Links for pagination, as described in the "[Pagination](#pagination)" subsection.
 
-All entity types are valid `children` aside from `root`.
+All entity types are valid `$items` aside from `collection`.
 
-### Pagination
+### <span id="pagination">Pagination</span>
 
-Some collections (such as for a record label or a private storage server) will be much too large for all data to be provided in a single view, and so there must be a means of breaking it up into chunks that can be incrementally retrieved. In order to facilitate this, the collection's `related` links may contain the following link types:
+Some collections (such as for a record label or a private storage server) will be much too large for all data to be provided in a single view, and so there must be a means of breaking it up into chunks that can be incrementally retrieved. In order to facilitate this, the collection's `links` may contain the following link `rel`s:
 
 * `self`: The canonical URL to this specific page, if this is an archival page
 * `current`: The URL to the current/most recent page of the collection (typically the main URL to the collection itself); **required** if this is not the current page
 * `next`: The next page of the collection, in the event that we are paginating
 * `previous`: The previous page of the collection, in the event that we are paginating
-* `all`: A URL that contains the full content of the collection, if that's feasible/reasonable
+* `full`: A URL that contains the full content of the collection, if that's feasible/reasonable
 
 Any changes which occur to elements which appeared on prior pages *MUST* appear on the page that is current at the time that the change took place. For example, if a piece of music that was published in January of 2020 was deleted in June of 2025, it's the page reflecting June 2025 that would contain the deletion. Similarly, updates to song metadata would occur in the collection at the time that the update happened. In this way, collection consumers do not need to re-traverse the entire backlog of a large collection to get all updates, and can incrementally update only by retrieving the current page and any pages that haven't already been retrieved.
 
-For this reason, past page URLs must also be stable; if the June 2025 page has a URL of e.g. `https://example.com/canimus/2025-06.json`, then it must *always* be at that URL. In this way, a consumer can stop traversing pages once it has encountered an archival URL that it has already processed.
+For this reason, past page URLs should also be stable; if the June 2025 page has a URL of e.g. `https://example.com/Chorus/2025-06.json`, then it should always be at that URL so that a consumer can stop traversing pages once it has encountered an archival URL that it has already processed per HTTP versioning headers (`If-Modified-Since`, `If-None-Match`, etc.).
 
-Note that different pages of a Canimus feed are considered to be separate documents, for the purpose of [entity references](#entity-reference).
+Note that different pages of a Chorus feed are considered to be separate documents, for the purpose of [entity references](#entity-reference).
+
+## <span id="label">Label</span>
+
+An entity of type `label` refers to a record label.
+
+Valid `$items` types:
+
+* [`release`](#release)
+* [`track`](#track)
+* [`artist`](#artist)
 
 ## <span id="artist">Artist</span>
 
-An entity of type `artist` is a performing artist. The `name` attribute refers to the primary name under which the artist releases.
+An entity of type `artist` is a releasing artist. The `name` attribute refers to the primary name under which the artist releases.
 
-Valid `children` types:
+Valid `$items` types:
 
-* [`album`](#album)
+* [`release`](#release)
 * [`track`](#track)
 
-## <span id="album">Album</span>
+## <span id="release">Release</span>
 
-An entity of type `album` is a collection of tracks. The `name` attribute refers to the title of the album. It contains the following additional properties:
+An entity of type `release` indicates a released item, typically an album containing one or more [`track`](#track)s. The `name` attribute refers to the title of the release. It contains the following additional properties:
 
-* `artist`: An [entity reference](#entity-reference) to the releasing artist of this album (also known as "album artist"). It defaults to the `name` and `uid` of the containing `artist`, if any.
-* `subtitle`: The subtitle of the album
-* `copyright`: The copyright information of the album
+* `label`: The [`label`](#label) that owns/manages this release. If not specified, it uses any [`label`](#label) associated with the [`artist`](#artist).
+* `artist`: The primary [`artist`](#artist) that owns/manages this release (also known as "album artist"). If not specified, it uses the [`artist`](#artist) that contains this `release`, if any.
+* `subtitle`: The subtitle of the release
+* `copyright`: The copyright information of the release
 * `license`: Any additional license information, e.g. `"CC by-nc-sa"`
-* `genre`: An arbitrary string of text that may indicate vaguely what sorts of people might like the music on this album
-* `featuring`: An array of additional featured artists as [entity references](#entity-reference), to indicate collaborations
+* `genre`: An arbitrary string of text that may indicate vaguely what sorts of people might like this release
+* `featuring`: An array of additional featured [`artist`](#artist)s, to indicate collaborations; these artists may also have additional properties such as:
+    * `role`: The role this artist played in the release
 
-Note that an `album` does not necessarily have to be contained by an `artist` node.
+Note that an `album` does not necessarily have to be contained by (or have) an `artist` element. In this case, it is up to the consumer to decide how to display this.
 
-Valid `children` types:
+Valid `$items` types:
 
+* [`artist`](#artist)
 * [`track`](#track)
 
 ## <span id="track">Track</span>
 
-An entity of type `track` refers to a playable track. If it is contained by an `album`, then it is given a playback order based on its position in the album's `children`; otherwise it is assumed to be a single.
+An entity of type `track` refers to a playable track. If it is contained by a [`release`](#release), then it is given a playback order based on its position in the album's `$items`; otherwise it may be assumed to be a single.
+
+It is **recommended** (but not required) that released singles be a [`release`](#release) containing a single `track`, and that any `track`s that are not contained by a [`release`](#release) still appear in the relevant [`artist`](#artist)'s discography.
 
 It has the following additional properties:
 
 * `subtitle`: The subtitle of the track, if any
-* `artist`: An [entity reference](#entity-reference) to the releasing artist of this track, which may differ from the album artist; if not specified it should default to the `artist` of the containing `album` or `artist`.
-* `featuring`: An array of additional featured artists as [entity references](#entity-reference), to indicate collaborations
-* `album`: An [entity reference](#entity-reference) to the album on which this track appears, if any; this is normally implied by the containing `album`, and in the case of a single release, may be blank.
+* `artist`: The primary [`artist`](#artist) that owns/manages this track. If not specified, it uses the [`artist`](#artist) of any containing [`release`](#release).
+* `featuring`: An array of additional featured [`artist`](#artist)s, to indicate collaborations; these artists may also have additional properties such as:
+    * `role`: The role this artist played in the track
 * `composer`: The composer(s) of the track's music
 * `lyricist`: The author(s) of the track's lyrics
-* `original_artist`: The original performing artist, if this song is a cover
+* `originalArtist`: The original performing artist, if this song is a cover
 * `duration`: The canonical length of the track, in seconds
-* `media`: A set of descriptors providing streamable versions of the audio. This **should** at the very least contain an `audio/mp3` and/or `audio/ogg` version for maximum compatibility, but may also contain other versions. Each descriptor contains the following properties:
+* `discNum`: The physical disc that the track appeared on, in the case of a multi-disc album
+* `trackNum`: The physical track number for the track on its disc
 
-    * `type`: The content-type of the media (e.g. `audio/mp3`, `audio/flac`, `video/mp4`, `application/x-mpegURL`, etc.); **required**
-    * `src`: The URL at which the media can be played; **required**
-    * `size`: The size of the content file, in bytes; **strongly recommended**
-    * `duration`: The duration of the media, in seconds, if it differs from the canonical length; **strongly recommended**
-    * `label`: The display label of the media, if it differs from the default musical experience (for example, "radio edit" or "music video" or the like)
+    Note that `discNum` and `trackNum` are purely for display purposes, and do not affect the natural playback order of the track, which is given by the order of the `track` elements within the containing [`release`](#release)'s `$items`.
 
-    There can be multiple media with the same type, differentiated by `size` to indicate different quality levels/bitrates, so that player applications can choose the appropriate quality level based on bandwidth availability.
+* `copyright`: The copyright information of the album (defaults to the containing [`release`](#release)'s)
+* `license`: Any additional license information, e.g. `"CC by-nc-sa"` (defaults to the containing [`release`](#release)'s)
 
-* `disc`: The physical disc that the track appeared on, in the case of a multi-disc album
-* `track`: The physical track number for the track on its disc
+* `lyrics`: The human-readable, non-synchronized lyrics of the track, if any; this should be provided as plain text with a single `\n` between lines, and `\n\n` between verses. Limited Markdown (such as `*emphasis*` and `**boldface**`) **may** be supported at the discretion of the consumer.
+* `synchronizedLyrics`: Synchronized lyrics, given as a list of elements with the following properties:
+    * `startTime`: The start time of the lyric, in seconds
+    * `endTime`: The end time of the lyric in seconds
+    * `voice`: The name of the voice that is singing/stating the lyric; this **should** be human-readable, and **must** be consistent throughout the track
+    * `text`: The representative text of the lyric
+    * `color`: A recommended color for the display of the lyric, given as a common color name or hex code
 
-    Note that `disc` and `track` are purely for display purposes, and do not affect the natural playback order of the track, which is given by the order of the `track` elements within the containing entity's `children`.
-
-* `copyright`: The copyright information of the album (defaults to the containing `album`'s if unspecified)
-* `license`: Any additional license information, e.g. `"CC by-nc-sa"` (defaults to the containing `album`'s if unspecified)
-
-* `lyrics`: The lyrics of the song, if any; this should be provided as plain text with a single `\n` between lines, and `\n\n` between verses. Limited Markdown (such as `*emphasis*` and `**boldface**`) may be supported at the discretion of the consumer.
-* `genre`: An arbitrary string of text that may indicate vaguely what sorts of people might like this track (defaults to the containing `album`'s if unspecified)
+* `genre`: An arbitrary string of text that may indicate vaguely what sorts of people might like this track (defaults to the containing `release`'s if unspecified)
 * `markers`: An array of markers to indicate different sections of a track, such as movements, chapters, or other similar metadata. Each array element contains the following properties:
 
     * `timestamp`: The time, in seconds, that the marker appears (relative to the start of the track); **required**
     * `label`: The label of the marker; **required**
-    * `type`: The type of marker, for example, `movement`, `section`, `chapter`, `index`, etc.
+    * `rel`: The type of marker, for example, `movement`, `section`, `chapter`, `index`, etc.
+
+* `credits`: An array of detailed credits for the production of the track, containing the following properties:
+
+    * `name`: The name of the person
+    * `role`: Their production role (e.g. vocals, instruments, production, coffee, etc.)
+
+* `media`: A list of descriptors providing streamable/listenable renditions of the track. This **should** contain at least one descriptor entity with a `contentType` of `audio/mp3` for maximum compatibility. Each descriptor contains the following properties:
+
+    * `contentType`: The content-type of the media (e.g. `audio/mp3`, `audio/flac`, `video/mp4`, `application/x-mpegURL`, etc.); **strongly recommended**
+    * `src`: The URL at which the media can be played; **required**
+    * `size`: The size of the content file, in bytes; **strongly recommended**
+    * `label`: A descriptive label for this rendition
+
+    There can be multiple media with the same type, differentiated by `size` to indicate different quality levels/bitrates, so that player applications can choose the appropriate quality level based on bandwidth availability.
+
+    This is not suitable for different versions of a song, however; those should be given either with `related` or `links` as appropriate.
 
 An example track might look like:
 
 ```json
 {
-    "type": "track",
-    "artist": "The Example Band",
-    "featuring": ["Another Band",
-      {
-        "name": "Yet another band",
-        "uid": "asdf-12345"
-      }],
+    "$type": "track",
+    "artist": {
+        "$type": "artist",
+        "name": "The Example Band"
+    },
+    "featuring": [
+        {
+            "$type": "artist",
+            "name": "Another Band"
+        },{
+            "$ref": "yet-another-band"
+        }
+    ],
     "name": "Introduction",
     "subtitle": "Radio Edit",
     "uid": "13a93b29-4e4b-4967-a077-cbe8491767ec",
     "url": "https://example.com/band/releases/introduction.html",
     "duration": 45,
     "disc": 1,
-    "track": 1,
-    "media": [{
-        "type": "audio/mp3",
-        "src": "https://cdn.example.com/artist/album/01 the introductory track.mp3",
-        "size": 737280
-    }, {
-        "type": "audio/flac",
-        "src": "https://cdn.example.com/artist/album/01 the introductory track.flac",
-        "size": 1843200,
-        "comment": "high-quality version"
-    }, {
-        "type": "video/mp4",
-        "src": "https://cdn.example.com/artist/videos/the introductory track.mp4",
-        "duration": 120,
-        "size": 384198472,
-        "comment": "music video"
-    }],
-    "markers": [{
-        "timestamp": 0,
-        "type": "movement",
-        "label": "Adagio"
-    }, {
-        "timestamp": 15,
-        "type": "movement",
-        "label": "Rondo - Vivace"
-    }, {
-        "timestamp": 30.7,
-        "type": "movement",
-        "label": "Larghetto i risoluzione"
+    "track": 17,
+    "media": [
+        {
+            "contentType": "audio/mp3",
+            "src": "https://cdn.example.com/artist/album/01 the introductory track.mp3",
+            "size": 737280
+        },
+        {
+            "contentType": "audio/mp3",
+            "src": "https://cdn.example.com/artist/album/01 the introductory track.hq.mp3",
+            "size": 1105920
+        },
+        {
+            "contentType": "audio/flac",
+            "src": "https://cdn.example.com/artist/album/01 the introductory track.flac",
+            "size": 1843200,
+            "label": "lossless version"
+        }
+    ],
+    "markers": [
+        {
+            "timestamp": 0,
+            "rel": "movement",
+            "label": "Adagio"
+        },
+        {
+            "timestamp": 15,
+            "rel": "movement",
+            "label": "Rondo - Vivace"
+        },
+        {
+            "timestamp": 30.7,
+            "rel": "movement",
+            "label": "Larghetto i risoluzione"
+        }
+    ],
+    "links": [{
+        "name": "Music video",
+        "contentType": "video/mp4",
+        "href": "https://cdn.example.com/artist/videos/the introductory track.mp4",
+        "rel": "video"
     }]
 }
 ```
@@ -248,52 +399,50 @@ A curated list of music to listen to, including tracks and albums. This can be u
 
 * `author`: The author of the playlist
 
-The `children` of this must include at least as much information as is necessary to recreate the entity assuming that this entity is the only data available. For example, for a `track` that is contained within the `catalog`, only `url` or `uid` are strictly necessary, but for music stored in other collections it must contain the full metadata from the other collection.
+The `$items` of this must include at least as much information as is necessary to recreate the entity assuming that this entity is the only data available. For example, for a `track` that is contained within the `collection`, only `$ref` is necessary, but for music stored in other collections it must contain the full metadata from the other collection.
 
 For example:
 
 ```json
 {
-    "type": "playlist",
+    "$type": "playlist",
+    "$id": "20a481cc-a340-4baf-8d89-d0973e3ec4cc",
     "author": "Example Curator",
-    "uid": "20a481cc-a340-4baf-8d89-d0973e3ec4cc",
-    "children": [{
-        "type": "track",
-        "artist": "Example Band",
+    "$items": [{
+        "$type": "track",
+        "artist": {"name": "Example Band"},
         "name": "Hit Single",
         "subtitle": "So tired",
         "duration": 120,
         "album": "Self-Titled Album",
         "url": "https://example.com/band/releases/hit-single.html",
         "media": [{
-            "type": "audio/mp3",
+            "contentType": "audio/mp3",
             "src": "https://cdn.example.com/artist/album/07 hit single.mp3",
             "size": 2949120
         }],
-        "disc": 1,
-        "track": 3,
-        "uid": "efd71467-3b9c-483c-a081-175f6a6f1a74"
+        "$id": "efd71467-3b9c-483c-a081-175f6a6f1a74"
     }, {
-        "type": "track",
-        "artist": "Another band",
+        "$type": "track",
+        "artist": {"name": "Another band"},
         "name": "A bigger fish to fry",
         "url": "https://example.com/other-band/fish.html",
         "media": [{
-            "type": "audio/mp3",
+            "contentType": "audio/mp3",
             "src": "https://cdn.example.com/other-band/fish.mp3",
             "size": 2949120
         }],
-        "uid": "1120a795-e51b-4666-b8f5-1904dd8b568f"
+        "$id": "1120a795-e51b-4666-b8f5-1904dd8b568f"
     }]
 }
 ```
 
-As with `album`, the position in the `children` list is what indicates the natural playback order of the song within the playlist; `track` and `disc` are used only for display purposes.
+As with [`release`](#release), the position in the `$items` list is what indicates the natural playback order of the song within the playlist; `trackNum` and `discNum`, if provided, are used only for display purposes.
 
-Valid `children` types:
+Valid `$items` types:
 
 * [`artist`](#artist)
-* [`album`](#album)
+* [`release`](#release)
 * [`track`](#track)
 
 ## <span id="events">Events</span>
@@ -302,13 +451,13 @@ Valid `children` types:
 
 An `events` entity represents a time-based event feed to indicate interaction events. It is similar to a `playlist` but is meant to be ephemeral in nature.
 
-The intention is that an individual user could publish a Canimus collection containing an `events` element as part of a greater recommendation system (with users subscribing to each others' feeds), and be similar to a "scrobbling" system such as [Last.fm](https://last.fm/), [Libre.fm](https://libre.fm/), or [ListenBrainz](https://listenbrainz.org/). However, its inclusion is only tentative and it is probably better for social elements to be in their own purpose-specific feed format that is expressed by e.g. ActivityPub, Atom, RSS, or similar.
+The intention is that an individual user could publish a Chorus collection containing an `events` element as part of a greater recommendation system (with users subscribing to each others' feeds), and be similar to a "scrobbling" system such as [Last.fm](https://last.fm/), [Libre.fm](https://libre.fm/), or [ListenBrainz](https://listenbrainz.org/). However, its inclusion is only tentative and it is probably better for social elements to be in their own purpose-specific feed format that is expressed by e.g. ActivityPub, Atom, RSS, or similar.
 
 It provides the following properties:
 
 * `author`: The author/originator of the event list
 
-Valid `children` types:
+Valid `$items` types:
 
 * [`event`](#event)
 
@@ -318,11 +467,12 @@ Valid `children` types:
 
 An `event` entity represents an individual interaction event. It contains the following properties:
 
-* `when`: When the item was added to the feed (i.e. when the event took place); this should be a date in a commonly-parseable format that is also timezone-aware
-* `disposition`: What the listener did with the item; this can be one of the following:
+* `when`: When the item was added to the feed (i.e. when the event took place), as a [datetime](#datetime)
+* `rel`: What the listener did with the item; this can be one of the following:
     * `play`: Indicates that this was an item played to completion
     * `skip`: Indicates that this item was skipped over, possibly after being partially played
     * `like`: Indicates that this item was enjoyed
     * `dislike`: Indicates that this item was not enjoyed
 * `comment`: Any comment left by the listener, expressing why they liked or disliked the item
-* `item`: Either the `uid` of the referenced item, or the item itself (see [playlist items](#playlist))
+
+All entity types are allowed in `$items`
