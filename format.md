@@ -178,11 +178,11 @@ If a `$ref` appears, its corresponding `$id` ***must*** appear in the same Choru
 
 ### <span id="localization">Localization</span>
 
-Any displayable string (name, description, etc.) will be assumed to be in the `$lang` of its container, propagating upwards. As such, it is **strongly recommended** that the top-level entity provide a `$lang`.
+Any attribute will be assumed to be in the `$lang` of its container, propagating upwards. It is **strongly recommended** that the top-level entity provide a `$lang`.
 
 Localization follows the [IETF BCP 47](https://www.rfc-editor.org/info/bcp47) standard.
 
-Language codes are defined by [RFC 5646](https://datatracker.ietf.org/doc/rfc5646/) (e.g. `en` for English, `en-US` for specifically US English).
+Locale codes are defined by [RFC 5646](https://datatracker.ietf.org/doc/rfc5646/) (e.g. `en` for English, `en-US` for specifically US English). The lists of language and region codes are given by [ISO-639-1](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes) and [ISO-3166-1 alpha-2](https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes), respectively.
 
 Alternate localizations are given by appending `$code` to the attribute name; for example:
 
@@ -195,7 +195,9 @@ Alternate localizations are given by appending `$code` to the attribute name; fo
 }
 ```
 
-Even if a string is fully localized, it **must** still provide a version without a locale suffix, as localization is considered optional.
+Even if an attribute is fully localized, it **must** still provide a version without a locale suffix, as localization is considered optional.
+
+Note that any attribute may be localized, which also allows for multiple language and region support for images, media renditions, and so on.
 
 #### Lookup algorithm
 
@@ -217,7 +219,7 @@ Sample implementations for attribute lookup are as below.
 
 ```python
 # Python implementation
-def get_string_localized(element:dict, attribute:str, locale:str=None):
+def get_attribute_localized(element:dict, attribute:str, locale:str=None):
     if locale:
         tags = locale.split('-')
         while tags:
@@ -230,11 +232,11 @@ def get_string_localized(element:dict, attribute:str, locale:str=None):
 
 ```js
 // JavaScript implementation
-function getStringLocalized(element, attribute, locale) {
+function getAttributeLocalized(element, attribute, locale) {
     if (locale) {
         var tags = locale.split('-')
         while (tags.length) {
-            key = `${attribute}\$${tags.join('-')}`
+            const key = `${attribute}\$${tags.join('-')}`
             if (element[key]) {
                 return element[key];
             }

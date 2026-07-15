@@ -88,6 +88,14 @@
                                     "src": "https://example.band/audio/first-track.mp3",
                                     "size": 7432893
                                 }
+                            ],
+                            "media$es": [
+                                {
+                                    "contentType": "audio/mp3",
+                                    "src": "https://example.band/audio/first-track.es.mp3",
+                                    "size": 7521923,
+                                    "$comment": "Versión en español"
+                                }
                             ]
                         },
                         {
