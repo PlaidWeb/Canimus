@@ -294,7 +294,11 @@ The `collection` entity can contain the following additional attributes:
 * `$protocol`: Refers to the protocol of the file, i.e. `"Chorus"`
 * `$version`: Refers to the base Chorus specification version in effect, e.g. "v0.2.5"
 * `$schema`: A URL to a JSON Schema reflective of the version of the protocol in use
-* `$deleted`: Items that have been previously published but are now removed from the collection, given as a list of `$id` values. These items **must not** appear anywhere else in the document, and furthermore **should** only appear if an item was previously published but is to be revoked.
+* `$deleted`: Items that have been previously published but are now removed from the collection, given as a list of `$id` values
+
+    These entities **must not** appear anywhere else in the document, and furthermore **should** only appear if an item was previously published but is to be revoked.
+
+    Any [entity references](#entity-reference) that refer to the original item are also to be removed.
 
 A collection supports the following additional link types, with the `rel` value set accordingly:
 
