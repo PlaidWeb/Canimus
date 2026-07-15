@@ -479,6 +479,12 @@ An `event` entity represents an individual interaction event. It contains the fo
     * `skip`: Indicates that this item was skipped over, possibly after being partially played
     * `like`: Indicates that this item was enjoyed
     * `dislike`: Indicates that this item was not enjoyed
-* `comment`: Any comment left by the listener, expressing why they liked or disliked the item
+* `comment`: Any comment left by the listener, expressing textual sentiment (e.g. why they liked or disliked the item)
 
-All entity types are allowed in `$items`
+Valid `$items` types:
+
+* [`label`](#label)
+* [`artist`](#artist)
+* [`release`](#release)
+* [`track`](#track)
+* [`playlist`](#playlist)

@@ -24,10 +24,10 @@ While "Chorus" as a name is simply in reference to independent musicians making 
 
 ## Glossary
 
-The following terms are used to describe the different parts of the system:
+The following terms are used to describe the different roles within the network:
 
-* **publisher**: A source of data into the network, such as a website operated by an independent artist or a music label
-* **receiver**: A system that subscribes to and aggregates Chorus collections as a backing storage for a player
+* **publisher**: A source of data into the network, such as a website operated by an independent artist, music label, or publishing platform
+* **receiver**: A system that subscribes to and aggregates Chorus collections as a backing storage for a player; also sometimes called a "client"
 * **player**: The user-facing interface that is used to browse and listen to music known by a receiver
 
 ## Documents
