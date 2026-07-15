@@ -8,9 +8,9 @@ Music discovery, consumption, and streaming is locked down by large corporations
 
 There are several disparate attempts to build a better world for musicians, but many of them are built on protocols that were not designed for this use case in mind. ActivityPub and RSS were simply not designed with the specific needs of distribution and discovery of musical content, and most of the existing attempts are built on top of those.
 
-Chorus is a lightweight syndication protocol that anyone can join in on, and which provides the much-needed structure for subscribing to musicians' streaming content in a way that enables fair payments, while also being Web-native.
+The Chorus format is a lightweight, web-native protocol that enables an ecosystem of independent music streaming, directly connecting musicians with listeners and removing the entrenched music industry from the equation. This allows us to build a better future for independent music on the Internet where musicians can publish directly to listeners.
 
-This is an expansion on the ideas stated in "[A fair independent streaming platform](https://beesbuzz.biz/blog/11155-A-fair-independent-streaming-platform)."
+This is an expansion of the ideas brainstormed in "[A fair independent streaming platform](https://beesbuzz.biz/blog/11155-A-fair-independent-streaming-platform)."
 
 ## History
 
@@ -28,7 +28,7 @@ The following terms are used to describe the different roles within the network:
 
 * **publisher**: A source of data into the network, such as a website operated by an independent artist, music label, or publishing platform
 * **receiver**: A system that subscribes to and aggregates Chorus collections as a backing storage for a player; also sometimes called a "client"
-* **player**: The user-facing interface that is used to browse and listen to music known by a receiver
+* **player**: The user-facing interface that is used to browse and listen to music known by a receiver; this may be tightly-coupled with the receiver, or may be connected in some other way (such as through an M3U-generating API or a live audio stream)
 
 ## Documents
 
@@ -49,9 +49,9 @@ Much of the metadata for the items *tends* to be consistent across an entire col
 
 Most current formats also exist to present new content in a stream of ephemera, without much attention given to older items.
 
-The Chorus format attempts to encapsulate a collection of music, which can be browsed, revisited, and categorized, while also taking advantage of the overall structure of an album as a sequential series of related songs, without necessarily being limited to that structure.
+The Chorus format encapsulates a collection of music, which can be browsed, revisited, and categorized, while also taking advantage of the overall structure of an album as a sequential series of related songs, without necessarily being limited to that structure.
 
-This format is also intended to be easy to publish and to parse, without any guesswork about what anything actually means. Musicians shouldn't have to sign up for every new distributed platform that springs up, when those platforms could subscribe to a common format as one potential source for music. They should be able to just add it as a format to publish their music to the web in a way that is, hopefully, easy to adapt into other ecosystems.
+This format is intended to be easy to publish and to parse, without any guesswork about what anything actually means. Musicians shouldn't have to sign up for every new distributed platform that springs up, when those platforms could subscribe to a common format as one potential source for music. They should be able to just add it as a format to publish their music to the web in a way that is, hopefully, easy to adapt into other ecosystems.
 
 ### Why not use RSS/Atom?
 
@@ -71,6 +71,8 @@ There are several ActivityPub-based music federation projects underway as well. 
 
 Any implementation of a music collection on top of ActivityPub would still have to implement the collection itself, and maintain standards for how backfilling works and how the collection is shaped, so why not start with a clean implementation that only provides the parts that are important to a music collection to begin with?
 
+ActivityPub itself also doesn't solve the issues of interoperability between different implementations; notably, existing ActivityPub implementations such as Bandwagon, Funkwhale, and PeerTube which all live in the same general problem domain still cannot meaningfully share data with one another, as they speak different vocabularies. Even different versions of the same ActivityPub implementation are not guaranteed to interoperate with one another.
+
 ### Why not microformats?
 
 While microformats are a very nice means of embedding metadata into HTML documents without requiring so-called "sidecar" formats, the unfortunate reality is that many content platforms these days are not serving up static HTML; instead they are built as app-style frontends which require Javascript to fetch the actual page content using frameworks like ReactJS and Vue, and while it would be really nice if we were still in a server-side-rendering-first web, that is no longer the case.
@@ -83,17 +85,15 @@ Additionally, it presents multiple performance issues; since all of the data is 
 
 Microformats also tend to make use of the page URL as the identifier, which adds difficulty to the process of reconciling URL changes. Microformats do support a `p-uid` property which can be used to reconcile this, but it isn't widely supported.
 
-Also, since every entity must be visible, that does not allow for things like feed-only content.
+Also, since every entity is mapped to a URL, there is no standard way to present content that does not map to a specific webpage.
 
 ### Why not JSON-LD?
 
-JSON-LD is meant to work similarly to microformats, with a large JSON blob embedded into a webpage. While this works well for discovery, it has major performance issues for actual data ingestion. Your choices are either to embed a complete catalog into the webpage for the root entity (which slows down every single webpage retrieval unnecessarily), or requires linking the data across webpages per entity and having consumers do a full tree walk, which in turn requires retrieving basically every webpage on a site in order to get the latest information, as there is no standard mechanism for indicating whether a dependency has changed.
+JSON-LD is meant to work similarly to microformats, with a large JSON blob embedded into a webpage. While this works well for discovery, it has major performance issues for actual data ingestion, and implications for the performance of the website as a whole. The choices are either to embed a complete catalog into the webpage for the root entity (which slows down every single webpage retrieval unnecessarily), or requires linking the data across webpages per entity and having consumers do a full tree walk, which in turn requires retrieving basically every webpage on a site in order to get the latest information, as there is no standard mechanism for indicating whether a dependency has changed.
 
 JSON-LD is also far less efficient than microformats, as the embedding structure is parallel to the webpage itself, and in many cases has significantly more overhead than the microformats markup.
 
 Additionally, JSON-LD uses the entity's URL as its identifier, which vastly complicates things when it comes to changing the URL of an item, which can happen when a webpage gets reorganized or if an item changes its name.
-
-Also, since every entity must be visible, that does not allow for things like feed-only content.
 
 ### What about [missing feature]?
 
@@ -107,9 +107,11 @@ It is also not meant to be an encyclopedic compendium of all music; this is not 
 
 From a publisher's standpoint, Chorus is just another template to add to a website, to make it easier for music to be discovered and listened to.
 
-From a player's standpoint, Chorus is just another means of obtaining a collection of music.
+From a receiver's standpoint, Chorus is just a means of obtaining a collection of music, which can work alongside other mechanisms.
 
-Nothing about this is exclusive; it's just meant to be simpler to support on both sides.
+Nothing about this is exclusive; it's just meant to be simpler to support on both sides, and flexible enough to provide real choices to both producers and consumers of music.
+
+Don't think "instead of," but "in addition to."
 
 ### What about access control? (paid access, subscriptions, etc.)
 

@@ -4,7 +4,7 @@ A Chorus collection is formatted as structured data, provided in a commonly-pars
 
 JSON is likely the simplest to implement and to build validation tools for, as most current web frameworks and languages already have direct first-class support for JSON. However, other formats such as XML and YAML are also plausible and should be considered. The document **must** be encoded as UTF-8, unless the serialization format has a means of specifying an alternate encoding.
 
-For the sake of this document, the assumption will be that the data is serialized in JSON format.
+For the sake of this specification, the assumption will be that the data is serialized in JSON format.
 
 ## Discovery
 
@@ -34,155 +34,38 @@ Attribute names are to be given in English and written in `camelCase` (first let
 
 Attributes with a name of `$comment` are allowed anywhere for documentation purposes; attributes with this name **must** be ignored by receivers and **must not** be used in any future revisions to the specification.
 
-### <span id="datetime">Dates and times</span>
-
-Dates and times are represented as strings in `YYYY[-MM[-DD[ hh:mm[:ss][+ZZZZ]]]]` format. For example, `2026-06-14 14:42-0700` is equivalent to June 14, 2026 at 2:42 PM in UTC-0700 (e.g. Pacific Daylight Time).
-
-If a given time lacks timezone information, it will be assumed to be UTC; `14:06:02` and `14:06:02+0000` are therefore equivalent.
-
-A consumer **should** make use of all available precision, but it is not specified how it treats varying levels of precision; for example:
-
-* It is not specified how `2026-06-14 12:34`, `2026-06-14`, `2026-06`, and `2026` sort relative to one another
-* `2026-06` must always come after `2026-05` and `2026-05-30`
-
-Per the above, dates may be trivially sorted and filtered lexically, but fully-specified datetimes need to be timezone-aware.
-
-### <span id="duration">Durations</span> and <span id="timestamps">timestamps</span>
-
-Durations and timestamps are given numerically as seconds, and **must** be serialized as a number. So, for example, a duration of 1 hour, 23 minutes, and 45.6 seconds is serialized as the number `5025.6`.
-
-A timestamp is relative to the start time of the respective media.
-
-### <span id="url">URLs</span>
-
-URLs **should** be given as absolute by publishers; however, receivers **must** treat all URLs as potentially-relative to the originating document.
-
-For example, if a document is at `https://example.com/chorus.json`, then a URL of `/foo.mp3` **must** be interpreted as `https://example.com/foo.mp3`, and a URL of `//cdn.example.com/bar.ogg` **must** be interpreted as `https://cdn.example.com/bar.ogg`.
-
-Example implementations of URL resolution in various languages:
-
-* JavaScript (including Node): [`URL()` constructor](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL)
-* Python: [`urllib.parse.urljoin`](https://docs.python.org/3/library/urllib.parse.html#urllib.parse.urljoin)
-* PHP: [`php-urljoin`](https://github.com/fluffy-critter/php-urljoin)
-
-
 ### Forward compatibility
 
 As attributes may be added to the specification in the future, any unknown attribute **must** be discarded/ignored by any receivers, and validators **must not** fail validation based on unknown attributes for a document that are written to a newer version of the specification than the validator. However, validators **may** issue a compatibility warning for unknown attributes.
 
 This concern also applies to semantic relationships, such as the `rel` of a link or a marker.
 
-## Entity definitions
+## Data type definitions
 
-These are the entities which can be defined by the document.
+### <span id="document">Document</span>
 
-The following attributes apply to all types of entity:
+A document is represented by a serialized [entity](#entity), typically in JSON format.
 
-* `$type`: The type of entity being defined; **required**
-* `$id`: An opaque, permanent string identifier to uniquely identify this entity relative to this collection; **strongly recommended**
-* `$items`: A list of items that are contained by this entity; an item may be another entity, or an [entity reference](#entity-reference)
-* `$lang`: The default [localization](#localization) for display strings; defaults to the language of the containing element
-* `url`: The canonical [URL](#url) for an HTML representation of the current entity, e.g. the webpage for the label/artist/release/track
-* `name`: The common name of the entity
+The root entity will typically be of type [`collection`](#collection).
 
-* `releaseDate`: The original release date, as a [datetime](#datetime)
-* `updatedDate`: The most recent update, as a [datetime](#datetime)
+### <span id="item">Item</span>
 
-    For both of these, partial dates are acceptable in the event that only the year or year and month are available.
+An "item" is a collection of key-value pairs ("attributes"). It corresponds to the following data types in various languages:
 
-    For consistency, this **should** be serialized as a string even if the serialization format natively supports datetimes (e.g. YAML).
+* JavaScript/JSON: `Object`
+* Python: `dict`
+* PHP: `array` (with named keys)
+* Perl: `hash`
 
-* `images`: A collection of images that are relevant to the display of the content. This is to be stored as a key-value dictionary, where the key is the type of image, and the value describes the image.
+### <span id="uid">Identifier</span>
 
-    Possible keys include (but are not limited to):
+An identifier uniquely and permanently refers to an entity within a collection. It is a textual string, and may include any printable character. It may or may not be human-readable, but the comparison between identifiers **must** be based on an exact match.
 
-    * `thumb`: A representative icon for the item (such as a logo)
-    * `main`: Primary artwork to be displayed in a player (primarily relevant to an album or track, but can also be used as a band fallback for things without artwork, for example)
-    * `photo`: A larger photographic image representing the item (headshots, profile images, etc.)
+It is **recommended** that implementations avoid using whitespace characters or characters which require escaping in the serialization format (such as quotes or angle brackets).
 
-    Each of these keys maps to a dictionary of properties, or an array of dictionaries, each of which include:
+Identifiers **must not** change due to changes in the underlying entity's attributes. For that reason it is **recommended** that an identifier be generated and permanently associated with an entity at the time of its creation. [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier)s are a good choice in general, UUID-4 and UUID-5 in particular.
 
-    * `src`: The [URL](#url) to retrieve the image from; **required**
-    * `alt`: The accessibility alt-text of the image; **strongly recommended**
-    * `width` and `height`: The nominal display sizes of the image; **strongly recommended**
-    * `contentType`: The MIME content type of the image (e.g. `image/png`, `image/jpeg`, `image/webp`); **strongly recommended**
-    * `alternates`: An array of alternate formats, each a dictionary of properties the same as above (excepting `alternates`)
-
-* `summary`: A short description of the entity, intended to be one single line of plain text
-* `description`: A longer description of the entity, formatted as [description Markdown](#description-text)
-* `relationship`: A brief explanation of how this entity is related to its containing entity; this is typically only used in an [entity reference](#entity-reference)
-
-* `links`: Associated links; stored as an array of property dictionaries, each of which includes the following attributes:
-    * `name`: The display name of the link; **required**
-    * `href`: The [URL](#url) target of the link; **required**
-    * `contentType`: The content-type of the link (e.g. `text/html`, `application/rss+xml`, etc.)
-    * `rel`: The relationship of this link to the item. These include, but are not limited to:
-        * `canonical`: The URL that is considered the canonical representation of this entity on the web
-        * `this`: An alternate URL that is also trusted to represent this entity
-        * `alternate`: A URL that represents an alternate version of this entity
-        * `support`: Indicates that this URL is where a listener may provide financial support to the artist
-        * `purchase`: Indicates that this URL is where a listener may obtain a copy of this content
-        * `video`: A place to see a music video for this content
-        * `icon`: A small image to represent the link, formatted the same way as it would be in `images`
-        * `license`: A full description of the license terms for the item
-
-        Note that more link relationships may be added in the future as additional needs are identified; as such, a link with an unknown `rel` should be either ignored or collected as an "other" type.
-
-* `related`: A list of entities which should be seen as related to this entity (for example, associated artists). These **should** include a `relationship` label.
-
-### <span id="entity-reference">Entity references</span>
-
-Many properties refer to items that may appear at multiple points in a collection. For example, a release may refer to multiple artists, and it may be desirable to only define the artist once in the collection. Similarly, it is possible for a track to appear in multiple releases, for example in a best-of compilation or similar.
-
-A reference is formed by declaring an item with a `$ref` that matches the `$id` of the original entity. Any additional properties will override those from the original `$id` without affecting the original, essentially modifying a copy. An entity reference **must not** have `$id` or `$type` attributes.
-
-A basic example follows:
-
-```json
-{
-    "$type": "collection",
-    "$items": [
-        {
-            "$type": "artist",
-            "$id": "artist-001",
-            "name": "Artist Number 1",
-            "url": "https://example.com/example-artist-1",
-            "$items": [{
-                "$type": "release",
-                "$id": "debut-album",
-                "name": "Debut Album",
-                "$items": [{
-                    "$type": "track",
-                    "$id": "hit-single",
-                    "name": "Hit Single",
-                }]
-            }, {
-                "$type": "release",
-                "$id": "best-of",
-                "name": "Best-Of Collection",
-                "$items": [{
-                    "$ref": "hit-single",
-                    "name": "Hit Single (original mix)"
-                }, {
-                    "$type": "track",
-                    "$id": "hit-single-remix",
-                    "name": "Hit Single (Bayside Boys Mix)",
-                }],
-                "related": [{
-                    "$ref": "debut-album",
-                    "relationship": "Original release"
-                }]
-            }]
-        }
-    ]
-}
-```
-
-If a `$ref` appears, its corresponding `$id` ***must*** appear in the same Chorus document.
-
-### <span id="localization">Localization</span>
-
-Any attribute will be assumed to be in the `$lang` of its container, propagating upwards. It is **strongly recommended** that the top-level entity provide a `$lang`.
+#### <span id="localization">Localization</span>
 
 Localization follows the [IETF BCP 47](https://www.rfc-editor.org/info/bcp47) standard.
 
@@ -202,8 +85,6 @@ Alternate localizations are given by appending `$code` to the attribute name; fo
 Even if an attribute is fully localized, it **must** still provide a version without a locale suffix, as localization is considered optional.
 
 Note that any attribute may be localized, which also allows for multiple language and region support for images, media renditions, and so on.
-
-#### Lookup algorithm
 
 The lookup algorithm is defined by [RFC 4647](https://datatracker.ietf.org/doc/rfc4647/). Namely, localized strings must be looked up based on exact matches, from most specific to least; for example, if the attribute `name` is requested in locale `en-US`, then the attribute should be looked up as `name$en-US`, `name$en`, and then finally `name`. A locale of `en-US` shall never receive a string for `en-UK`.
 
@@ -251,11 +132,152 @@ function getAttributeLocalized(element, attribute, locale) {
 }
 ```
 
+### <span id="entity">Entity</span>
+
+An "entity" is an [item](#item) that represents a concrete object in the collection.
+
+All entities support the following attributes:
+
+* `$type`: The type of entity being defined; **required**
+* `$id`: An opaque, permanent string [identifier](#uid) to uniquely identify this entity relative to this collection; **strongly recommended**
+* `$items`: A list of items that are contained by this entity; an item may be another entity, or an [entity reference](#entity-reference)
+* `$lang`: The default [localization](#localization) for display strings; defaults to the `$lang` of the containing entity
+
+    It is **strongly recommended** that entities provide a `$lang`, so that localization-aware clients will know what the default localization refers to. This is useful for things such as automatic translation or displaying metadata about the item's language of origin.
+
+    Because `$lang` is inherited from the containing entity, it is appropriate to set a collection-wide default by applying it only to the top-level entity.
+
+* `url`: The canonical [URL](#url) for an HTML representation of the current entity, e.g. the webpage for the label/artist/release/track
+* `name`: The common name of the entity
+
+* `releaseDate`: The original release date, as a [datetime](#datetime)
+* `updatedDate`: The most recent update, as a [datetime](#datetime)
+
+    For both of these, partial dates are acceptable in the event that only the year or year and month are available.
+
+    For consistency, this **should** be serialized as a string even if the serialization format natively supports datetimes (e.g. YAML).
+
+* `images`: A collection of images that are relevant to the display of the content. This is to be stored as a key-value dictionary, where the key is the type of image, and the value is an array of image descriptors.
+
+    Possible keys include (but are not limited to):
+
+    * `thumb`: A representative icon for the item (such as a logo)
+    * `main`: Primary artwork to be displayed in a player (primarily relevant to an album or track, but can also be used as a band fallback for things without artwork, for example)
+    * `photo`: A larger photographic image representing the item (headshots, profile images, etc.)
+
+    Each of the image descriptors is an [item](#item) with the following attributes:
+
+    * `src`: The [URL](#url) to retrieve the image from; **required**
+    * `alt`: The accessibility alt-text of the image; **strongly recommended**
+    * `width` and `height`: The nominal display sizes of the image; **strongly recommended**
+    * `contentType`: The MIME content type of the image (e.g. `image/png`, `image/jpeg`, `image/webp`); **strongly recommended**
+
+    If there are multiple descriptors available, the client is free to select the one that is the closest fit for its own display purposes (for example, selecting the most appropriate resolution or aspect ratio).
+
+* `summary`: A short description of the entity, intended to be one single line of plain text
+* `description`: A longer/detailed description of the entity, formatted as [limited HTML](#description-text)
+* `relationship`: A brief explanation of how this entity is related to its containing entity
+
+    For example:
+
+    ```json
+    {
+        "$id": "artist-fwiffo",
+        "$type": "artist",
+        "name": "Fwiffo the Great",
+        "related": [
+            {
+                "$id": "artist-zorniwoop",
+                "name": "Zorniwoop the Lesser",
+                "relationship": "Former name"
+            }, {
+                "$ref": "artist-orangetheory",
+                "relationship": "Our old lead singer's new band"
+            }
+        ]
+    }
+    ```
+
+* `links`: Associated links; stored as an array of property dictionaries, each of which includes the following attributes:
+    * `name`: The display name of the link; **required**
+    * `href`: The [URL](#url) target of the link; **required**
+    * `contentType`: The content-type of the link (e.g. `text/html`, `application/rss+xml`, etc.)
+    * `rel`: The relationship of this link to the item. These include, but are not limited to:
+        * `canonical`: The URL that is considered the canonical representation of this entity on the web
+        * `this`: An alternate URL that is also trusted to represent this entity
+        * `alternate`: A URL that represents an alternate version of this entity
+        * `support`: Indicates that this URL is where a listener may provide financial support to the artist
+        * `purchase`: Indicates that this URL is where a listener may obtain a copy of this content
+        * `video`: A place to see a music video for this content
+        * `icon`: A small image to represent the link, formatted the same way as it would be in `images`
+        * `license`: A full description of the license terms for the item
+
+        Note that more link relationships may be added in the future as additional needs are identified; as such, a link with an unknown `rel` should be either ignored or collected as an "other" type.
+
+* `related`: A list of entities which should be seen as related to this entity (for example, associated artists). These **should** include a `relationship` label.
+
+### <span id="entity-reference">Entity reference</span>
+
+Some [entities](#entity) need to appear multiple times in a collection. For example, artists with their own discographies may also appear in one or more tracks on compilation albums, or may be featured artists on another artist's releases. Similarly, one track may appear in multiple places, such as a label's compilation or in a playlist.
+
+An entity reference is an item with a `$ref` that matches the `$id` of the original entity. Any additional properties will override those from the original `$id` without affecting the original, essentially modifying a copy. An entity reference **must not** have `$id` or `$type` attributes.
+
+If a `$ref` appears, its corresponding `$id` ***must*** appear in the same Chorus document.
+
+An entity reference is considered to have the same `$type` as the underlying entity, and should be validated accordingly.
+
+A basic example follows:
+
+```json
+{
+    "$type": "collection",
+    "$items": [
+        {
+            "$comment": "This is an artist being defined directly",
+            "$type": "artist",
+            "$id": "artist-001",
+            "name": "Artist Number 1",
+            "url": "https://example.com/example-artist-1",
+            "$items": [{
+                "$comment": "This is a one-track album with a single track, 'hit single'",
+                "$type": "release",
+                "$id": "debut-album",
+                "name": "Debut Album",
+                "$items": [{
+                    "$type": "track",
+                    "$id": "hit-single",
+                    "name": "Hit Single",
+                }]
+            }, {
+                "$comment": "This is a best-of collection which includes 'hit single' and a remix",
+                "$type": "release",
+                "$id": "best-of",
+                "name": "Best-Of Collection",
+                "$items": [{
+                    "$comment": "This references the original version of 'hit single' but adds a subtitle",
+                    "$ref": "hit-single",
+                    "subtitle": "original mix"
+                }, {
+                    "$comment": "This is a new remix of 'hit single' for this album",
+                    "$type": "track",
+                    "$id": "hit-single-remix",
+                    "name": "Hit Single",
+                    "subtitle": "Bayside Boys Mix"
+                }],
+                "related": [{
+                    "$comment": "This provides a link back to the original release of 'hit single'",
+                    "$ref": "debut-album",
+                    "relationship": "Original release"
+                }]
+            }]
+        }
+    ]
+}
+```
+
 ### <span id="markdown">Limited Markdown</span>
 
 Longer text, such as the `description` attribute, may benefit from a rich text presentation. To this end, display clients such as players **should** render these text fields as [Markdown](https://markdown.org/). The recommended Markdown subset varies by context.
-
-Raw HTML tags ***must not*** be supported; in contexts where the text display is being handled by an HTML renderer (such as in a browser or embedded WebView), entities **must** be encoded (for example, converting the text `<hello>` to the HTML `&lt;hello&gt;`).
 
 #### <span id="description-text">Descriptions</span>
 
@@ -263,7 +285,7 @@ In descriptions, the following markup types **must** be supported:
 
 * Paragraphs
 
-and the following **should** be supported:
+The following **should** be supported:
 
 * Emphasis
 * Headings
@@ -272,9 +294,19 @@ and the following **should** be supported:
 * Quotes
 * Code (both inline and fenced/indented blocks)
 
-However, the definition of "supported" is up to the discretion of the implementer; for example, it is totally valid for an implementation to render it as plain text, or to render links as just the link text (e.g. rendering `[Hello](https://youtu.be/dQw4w9WgXcQ)` as just the string `Hello`).
+The level of support is up to the discretion of the implementer; for example, it is totally valid for an implementation to render it as plain text, or to render links as just the link text (e.g. rendering `[Hello](https://youtu.be/dQw4w9WgXcQ)` as just the string `Hello`).
 
-For the purpose of security, it is not recommended that clients support full or extended Markdown syntax; for example, images, tables, and footnotes **should not** be supported. It is up to the implementation as to whether these facets are stripped out or if they're displayed as the raw text string.
+The following Markdown features **should not** be supported:
+
+* Images
+* Raw HTML tags
+* Tables
+* Footnotes
+* Other extensions
+
+It is up to the implementation as to whether these features should be stripped out entirely or replaced with a plaintext representation.
+
+As a reminder, it is also entirely valid for a receiver to simply ignore the `description` attribute altogether.
 
 #### <span id="lyric-text">Lyrics</span>
 
@@ -283,9 +315,48 @@ In lyrics, the following markup types **should** be supported:
 * Emphasis
 * Inline code
 
-However, it is valid for an implementation to only lyric text as the raw string.
+It is valid for an implementation to display lyric text as the raw string.
 
-## <span id="collection">Collection</span>
+Raw HTML tags ***must not*** be supported; in contexts where the text display is being handled by an HTML renderer (such as in a browser or embedded WebView), entities **must** be encoded (for example, converting the text `<hello>` to the HTML `&lt;hello&gt;`).
+
+### <span id="datetime">Dates and times</span>
+
+Dates and times are represented as strings in `YYYY[-MM[-DD[ hh:mm[:ss][+ZZZZ]]]]` format. For example, `2026-06-14 14:42-0700` is equivalent to June 14, 2026 at 2:42 PM in UTC-0700 (e.g. Pacific Daylight Time).
+
+If a given time lacks timezone information, it will be assumed to be UTC; `14:06:02` and `14:06:02+0000` are therefore equivalent.
+
+A consumer **should** make use of all available precision, but it is not specified how it treats varying levels of precision; for example:
+
+* It is not specified how `2026-06-14 12:34`, `2026-06-14`, `2026-06`, and `2026` sort relative to one another
+* `2026-06` must always come after `2026-05` and `2026-05-30`
+
+Per the above, dates may be trivially sorted and filtered lexically, but fully-specified datetimes need to be timezone-aware.
+
+### <span id="duration">Durations</span> and <span id="timestamps">timestamps</span>
+
+Durations and timestamps are given numerically as seconds, and **must** be serialized as a number. So, for example, a duration of 1 hour, 23 minutes, and 45.6 seconds is serialized as the number `5025.6`.
+
+A timestamp is relative to the start time of the respective media.
+
+### <span id="url">URLs</span>
+
+A URL is a string that references an external resource.
+
+URLs **should** be given as absolute by publishers; however, receivers **must** treat all URLs as potentially-relative to the originating document.
+
+For example, if a document is at `https://example.com/chorus.json`, then a URL of `/foo.mp3` **must** be interpreted as `https://example.com/foo.mp3`, and a URL of `//cdn.example.com/bar.ogg` **must** be interpreted as `https://cdn.example.com/bar.ogg`.
+
+Example implementations of URL resolution in various languages:
+
+* JavaScript (including Node): [`URL()` constructor](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL)
+* Python: [`urllib.parse.urljoin`](https://docs.python.org/3/library/urllib.parse.html#urllib.parse.urljoin)
+* PHP: [`php-urljoin`](https://github.com/fluffy-critter/php-urljoin)
+
+## Entity types
+
+These are the types of [entities](#entity) known to the collection format.
+
+### <span id="collection">Collection</span>
 
 The top-level entity **should** have a type of `collection`. A `collection` entity cannot be contained by other entities.
 
@@ -307,7 +378,7 @@ A collection supports the following additional link types, with the `rel` value 
 
 All entity types are valid `$items` aside from `collection`.
 
-### <span id="pagination">Pagination</span>
+#### <span id="pagination">Pagination</span>
 
 Some collections (such as for a record label or a private storage server) will be much too large for all data to be provided in a single view, and so there must be a means of breaking it up into chunks that can be incrementally retrieved. In order to facilitate this, the collection's `links` may contain the following link `rel`s:
 
@@ -317,13 +388,13 @@ Some collections (such as for a record label or a private storage server) will b
 * `previous`: The previous page of the collection, in the event that we are paginating
 * `full`: A URL that contains the full content of the collection, if that's feasible/reasonable
 
-Any changes which occur to elements which appeared on prior pages *MUST* appear on the page that is current at the time that the change took place. For example, if a piece of music that was published in January of 2020 was deleted in June of 2025, it's the page reflecting June 2025 that would contain the deletion. Similarly, updates to song metadata would occur in the collection at the time that the update happened. In this way, collection consumers do not need to re-traverse the entire backlog of a large collection to get all updates, and can incrementally update only by retrieving the current page and any pages that haven't already been retrieved.
+Any changes which occur to elements which appeared on prior pages **must** appear on the page that is current at the time that the change took place. For example, if a piece of music that was published in January of 2020 was deleted in June of 2025, it's the page reflecting June 2025 that would contain the deletion. Similarly, updates to song metadata would occur in the collection at the time that the update happened. In this way, collection consumers do not need to re-traverse the entire backlog of a large collection to get all updates, and can incrementally update only by retrieving the current page and any pages that haven't already been retrieved.
 
 For this reason, past page URLs should also be stable; if the June 2025 page has a URL of e.g. `https://example.com/Chorus/2025-06.json`, then it should always be at that URL so that a consumer can stop traversing pages once it has encountered an archival URL that it has already processed per HTTP versioning headers (`If-Modified-Since`, `If-None-Match`, etc.).
 
-Note that different pages of a Chorus collection are considered to be separate documents, for the purpose of [entity references](#entity-reference).
+Note that different pages of a Chorus collection are considered to be separate documents, for the purpose of [entity references](#entity-reference). However, entity identifiers **must** be consistent across pages.
 
-## <span id="label">Label</span>
+### <span id="label">Label</span>
 
 An entity of type `label` refers to a record label.
 
@@ -333,7 +404,7 @@ Valid `$items` types:
 * [`track`](#track)
 * [`artist`](#artist)
 
-## <span id="artist">Artist</span>
+### <span id="artist">Artist</span>
 
 An entity of type `artist` is a releasing artist. The `name` attribute refers to the primary name under which the artist releases.
 
@@ -342,7 +413,7 @@ Valid `$items` types:
 * [`release`](#release)
 * [`track`](#track)
 
-## <span id="release">Release</span>
+### <span id="release">Release</span>
 
 An entity of type `release` indicates a released item, typically an album containing one or more [`track`](#track)s. The `name` attribute refers to the title of the release. It contains the following additional properties:
 
@@ -362,7 +433,7 @@ Valid `$items` types:
 * [`artist`](#artist)
 * [`track`](#track)
 
-## <span id="track">Track</span>
+### <span id="track">Track</span>
 
 An entity of type `track` refers to a playable track. If it is contained by a [`release`](#release), then it is given a playback order based on its position in the album's `$items`; otherwise it may be assumed to be a single.
 
@@ -426,6 +497,8 @@ An example track might look like:
 ```json
 {
     "$type": "track",
+    "$id": "13a93b29-4e4b-4967-a077-cbe8491767ec",
+
     "artist": {
         "$type": "artist",
         "name": "The Example Band"
@@ -440,7 +513,6 @@ An example track might look like:
     ],
     "name": "Introduction",
     "subtitle": "Radio Edit",
-    "uid": "13a93b29-4e4b-4967-a077-cbe8491767ec",
     "url": "https://example.com/band/releases/introduction.html",
     "duration": 45,
     "disc": 1,
@@ -489,7 +561,7 @@ An example track might look like:
 }
 ```
 
-## <span id="playlist">Playlist</span>
+### <span id="playlist">Playlist</span>
 
 ==NOTE:== This section of the specification is especially rough and likely to change.
 
@@ -543,7 +615,7 @@ Valid `$items` types:
 * [`release`](#release)
 * [`track`](#track)
 
-## <span id="events">Events</span>
+### <span id="events">Events</span>
 
 ==NOTE:== This section of the specification is especially rough and likely to change.
 
@@ -559,7 +631,7 @@ Valid `$items` types:
 
 * [`event`](#event)
 
-## <span id="event">Event</span>
+### <span id="event">Event</span>
 
 ==NOTE:== This section of the specification is especially rough and likely to change.
 
