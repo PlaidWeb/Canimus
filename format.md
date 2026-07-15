@@ -2,8 +2,6 @@
 
 A Chorus collection is formatted as structured data, provided in a commonly-parseable format that provides nested key-value pairs and arrays of data. Every hierarchical layer represents a single entity, which may contain other entities.
 
-A case can be made for embedding the data directly into webpages using [microformats](https://microformats.org/). However, quite a few of the existing systems for music distribution are implemented as single-page applications and do not offer server-side rendering, and for those existing systems it would be much easier for them to present the data via an API endpoint, for which there is no meaningful advantage to HTML+mf2 or the like. For this reason, it presents a much lower-friction path to having a structured feed format as the primary interchange format.
-
 JSON is likely the simplest to implement and to build validation tools for, as most current web frameworks and languages already have direct first-class support for JSON. However, other formats such as XML and YAML are also plausible and should be considered. The document **must** be encoded as UTF-8, unless the serialization format has a means of specifying an alternate encoding.
 
 The top-level element **should** be of type [`collection`](#collection).
@@ -22,7 +20,7 @@ From an HTML or XML document this will most likely be a `<link>` tag, for exampl
 
 in the referring document's `<head>`.
 
-It is also recommended to provide a [`Link:` HTTP response header](https://www.w3.org/wiki/LinkHeader), and for clients to honor that response header in the event that `<link>` is not available or relevant.
+It is also recommended to provide a [`Link:` HTTP response header](https://www.w3.org/wiki/LinkHeader), and for receivers to honor that response header in the event that `<link>` is not available or relevant.
 
 ## Style guide
 
@@ -36,7 +34,7 @@ Structural attribute names **must not** be reused by element attribute names; fo
 
 Attribute names are to be given in English and written in `camelCase` (first letter of the first word lowercase, no separator between words, additional words capitalized). Embedded acronyms are treated as single words; so for example a theoretical attribute of "HTML AJAX Endpoint" would appear as `htmlAjaxEndpoint`.
 
-Attributes with a name of `$comment` are allowed anywhere for documentation purposes; attributes with this name **must** be ignored by clients and **must not** be used in any future revisions to the specification.
+Attributes with a name of `$comment` are allowed anywhere for documentation purposes; attributes with this name **must** be ignored by receivers and **must not** be used in any future revisions to the specification.
 
 ### Dates and times
 
@@ -54,7 +52,7 @@ A consumer **should** make use of all available precision, but it is not specifi
 
 ### <span id="url">URLs</span>
 
-URLs **should** be given as absolute by publishers; however, clients **must** treat all URLs as potentially-relative to the originating document.
+URLs **should** be given as absolute by publishers; however, receivers **must** treat all URLs as potentially-relative to the originating document.
 
 For example, if a document is at `https://example.com/chorus.json`, then a URL of `/foo.mp3` **must** be interpreted as `https://example.com/foo.mp3`, and a URL of `//cdn.example.com/bar.ogg` **must** be interpreted as `https://cdn.example.com/bar.ogg`.
 
@@ -67,7 +65,7 @@ Example implementations of URL resolution in various languages:
 
 ### Forward compatibility
 
-As attributes may be added to the specification in the future, any unknown attribute **must** be discarded/ignored by any clients, and validators **must not** fail validation based on unknown attributes for a document that are written to a newer version of the specification than the validator. However, validators **may** issue a compatibility warning for unknown attributes.
+As attributes may be added to the specification in the future, any unknown attribute **must** be discarded/ignored by any receivers, and validators **must not** fail validation based on unknown attributes for a document that are written to a newer version of the specification than the validator. However, validators **may** issue a compatibility warning for unknown attributes.
 
 This concern also applies to semantic relationships, such as the `rel` of a link or a marker.
 
@@ -80,7 +78,7 @@ The following attributes apply to all types of entity:
 * `$type`: The type of entity being defined; **required**
 * `$id`: An opaque, permanent string identifier to uniquely identify this entity relative to this collection; **strongly recommended**
 * `$items`: A list of entities that are contained by this entity
-* `$lang`: The default [localization](#localization) for display strings; defaults to the language of the parent element
+* `$lang`: The default [localization](#localization) for display strings; defaults to the language of the containing element
 * `url`: The canonical [URL](#url) for an HTML representation of the current entity, e.g. the webpage for the label/artist/release/track
 * `name`: The common name of the entity
 
@@ -227,7 +225,7 @@ Any changes which occur to elements which appeared on prior pages *MUST* appear 
 
 For this reason, past page URLs should also be stable; if the June 2025 page has a URL of e.g. `https://example.com/Chorus/2025-06.json`, then it should always be at that URL so that a consumer can stop traversing pages once it has encountered an archival URL that it has already processed per HTTP versioning headers (`If-Modified-Since`, `If-None-Match`, etc.).
 
-Note that different pages of a Chorus feed are considered to be separate documents, for the purpose of [entity references](#entity-reference).
+Note that different pages of a Chorus collection are considered to be separate documents, for the purpose of [entity references](#entity-reference).
 
 ## <span id="label">Label</span>
 
@@ -274,6 +272,8 @@ An entity of type `track` refers to a playable track. If it is contained by a [`
 
 It is **recommended** (but not required) that released singles be a [`release`](#release) containing a single `track`, and that any `track`s that are not contained by a [`release`](#release) still appear in the relevant [`artist`](#artist)'s discography.
 
+Also note that standalone tracks **cannot** have a [`label`](#label); to assign a label to a track it must be part of a [`release`](#release).
+
 It has the following additional properties:
 
 * `subtitle`: The subtitle of the track, if any
@@ -294,17 +294,21 @@ It has the following additional properties:
 
 * `lyrics`: The human-readable, non-synchronized lyrics of the track, if any; this should be provided as plain text with a single `\n` between lines, and `\n\n` between verses. Limited Markdown (such as `*emphasis*` and `**boldface**`) **may** be supported at the discretion of the consumer.
 * `synchronizedLyrics`: Synchronized lyrics, given as a list of elements with the following properties:
-    * `startTime`: The start time of the lyric, in seconds
-    * `endTime`: The end time of the lyric in seconds
+    * `startTime`: The start time of the lyric, in seconds; **required**
+    * `endTime`: The end time of the lyric in seconds; **strongly recommended**
     * `voice`: The name of the voice that is singing/stating the lyric; this **should** be human-readable, and **must** be consistent throughout the track
     * `text`: The representative text of the lyric
     * `color`: A recommended color for the display of the lyric, given as a common color name or hex code
+
+    Note that lyrics may overlap (such as in the case of duets or staggered vocals).
+
+    If `endTime` is not given, it is up to the implementation to decide a reasonable duration for the lyric to be displayed.
 
 * `genre`: An arbitrary string of text that may indicate vaguely what sorts of people might like this track (defaults to the containing `release`'s if unspecified)
 * `markers`: An array of markers to indicate different sections of a track, such as movements, chapters, or other similar metadata. Each array element contains the following properties:
 
     * `timestamp`: The time, in seconds, that the marker appears (relative to the start of the track); **required**
-    * `label`: The label of the marker; **required**
+    * `text`: The text label of the marker; **required**
     * `rel`: The type of marker, for example, `movement`, `section`, `chapter`, `index`, etc.
 
 * `credits`: An array of detailed credits for the production of the track, containing the following properties:
@@ -317,7 +321,7 @@ It has the following additional properties:
     * `contentType`: The content-type of the media (e.g. `audio/mp3`, `audio/flac`, `video/mp4`, `application/x-mpegURL`, etc.); **strongly recommended**
     * `src`: The URL at which the media can be played; **required**
     * `size`: The size of the content file, in bytes; **strongly recommended**
-    * `label`: A descriptive label for this rendition
+    * `description`: A descriptive label for this rendition
 
     There can be multiple media with the same type, differentiated by `size` to indicate different quality levels/bitrates, so that player applications can choose the appropriate quality level based on bandwidth availability.
 
@@ -362,24 +366,24 @@ An example track might look like:
             "contentType": "audio/flac",
             "src": "https://cdn.example.com/artist/album/01 the introductory track.flac",
             "size": 1843200,
-            "label": "lossless version"
+            "description": "lossless version"
         }
     ],
     "markers": [
         {
             "timestamp": 0,
             "rel": "movement",
-            "label": "Adagio"
+            "text": "Adagio"
         },
         {
             "timestamp": 15,
             "rel": "movement",
-            "label": "Rondo - Vivace"
+            "text": "Rondo - Vivace"
         },
         {
             "timestamp": 30.7,
             "rel": "movement",
-            "label": "Larghetto i risoluzione"
+            "text": "Larghetto i risoluzione"
         }
     ],
     "links": [{

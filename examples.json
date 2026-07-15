@@ -17,20 +17,49 @@
             "href": "https://example.com/sample-collection-full.json"
         }
     ],
+    "$deleted": [
+        "123-gone",
+        "456-oops"
+    ],
     "$items": [
         {
             "$type": "artist",
             "$id": "1234-exampleband",
             "name": "Example Band",
+            "name$es": "Banda de Ejemplo",
             "url": "https://example.band",
             "description": "The hit indie band from Exampletown, Idaho",
             "$items": [
                 {
                     "$type": "track",
+                    "$id": "hit-single",
                     "name": "Hit Single",
                     "url": "https://example.band/track/hit-single",
                     "duration": 245,
+                    "genre": "Rock",
                     "lyrics": "This is a song\nIt is not very long\nWould you please listen\nTo this silly song",
+                    "synchronizedLyrics": [
+                        {
+                            "startTime": 17,
+                            "endTime": 20,
+                            "text": "This is a song"
+                        },
+                        {
+                            "startTime": 22.5,
+                            "endTime": 27,
+                            "text": "It is not very long"
+                        },
+                        {
+                            "startTime": 28,
+                            "endTime": 29.2,
+                            "text": "Would you please listen"
+                        },
+                        {
+                            "startTime": 29.7,
+                            "endTime": 31,
+                            "text": "To this silly song"
+                        }
+                    ],
                     "media": [
                         {
                             "$type": "audio/mp3",
@@ -45,6 +74,9 @@
                     "url": "https://example.band/album/self-titled",
                     "description": "This album has three tracks on it.",
                     "date": "2024-02-29",
+                    "label": {
+                        "$ref": "lbl-mecagorp"
+                    },
                     "$items": [
                         {
                             "$type": "track",
@@ -71,8 +103,11 @@
                             ]
                         },
                         {
+                            "$ref": "hit-single"
+                        },
+                        {
                             "$type": "track",
-                            "name": "Third track",
+                            "name": "Next track",
                             "url": "https://example.band/track/third-track",
                             "media": [
                                 {
@@ -84,9 +119,48 @@
                         },
                         {
                             "$type": "track",
+                            "name": "Piano Sonata No.20, Op.49 No.2",
+                            "composer": "Ludwig Van Beethoven",
+                            "duration": 971,
+                            "markers": [
+                                {
+                                    "timestamp": 0,
+                                    "rel": "movement",
+                                    "text": "Allegro ma no troppo"
+                                },
+                                {
+                                    "timestamp": 282,
+                                    "rel": "movement",
+                                    "text": "Tempo di menuetto"
+                                }
+                            ],
+                            "media": [
+                                {
+                                    "contentType": "audio/mp3",
+                                    "src": "https://example.band/audio/op49no2.mp3"
+                                }
+                            ],
+                            "credits": [
+                                {
+                                    "name": "Sam Sampson",
+                                    "role": "Piano"
+                                },
+                                {
+                                    "name": "Georgie Gorgerson",
+                                    "role": "Mixing and mastering"
+                                }
+                            ]
+                        },
+                        {
+                            "$type": "track",
                             "name": "Final track",
                             "url": "https://example.band/track/final-track",
-                            "featuring": [{"name": "Collaborating Band 1","$id": "collab-band-1"}],
+                            "featuring": [
+                                {
+                                    "name": "Collaborating Band 1",
+                                    "$ref": "collab-band-1"
+                                }
+                            ],
                             "media": [
                                 {
                                     "contentType": "audio/mp3",
@@ -114,6 +188,10 @@
             "name": "Our Collaboration",
             "url": "https://example.band/collabs/our-collaboration",
             "description": "A bunch of us got together to record an album in a weekend.",
+            "label": {
+                "$ref": "lbl-mecagorp",
+                "name": "MecaGorp ConHugeCo"
+            },
             "children": [
                 {
                     "$type": "track",
@@ -123,7 +201,11 @@
                     },
                     "name": "Setting the example",
                     "url": "https://example.band/collabs/our-collaboration/1",
-                    "media": [{"src": "https://example.band/collabs/our-collaboration/1.mp3"}]
+                    "media": [
+                        {
+                            "src": "https://example.band/collabs/our-collaboration/1.mp3"
+                        }
+                    ]
                 },
                 {
                     "$type": "track",
@@ -133,7 +215,11 @@
                     },
                     "name": "The second track",
                     "url": "https://example.band/collabs/our-collaboration/2",
-                    "media": [{"src": "https://example.band/collabs/our-collaboration/2.mp3"}]
+                    "media": [
+                        {
+                            "src": "https://example.band/collabs/our-collaboration/2.mp3"
+                        }
+                    ]
                 },
                 {
                     "$type": "track",
@@ -152,9 +238,20 @@
                     ],
                     "name": "The second track",
                     "url": "https://example.band/collabs/our-collaboration/2",
-                    "media": [{"src": "https://example.band/collabs/our-collaboration/2.mp3"}]
+                    "media": [
+                        {
+                            "src": "https://example.band/collabs/our-collaboration/2.mp3"
+                        }
+                    ]
                 }
             ]
+        },
+        {
+            "$type": "label",
+            "$id": "lbl-mecagorp",
+            "url": "https://mecagorp.com/",
+            "name": "MecaGorp",
+            "description": "We are bigger than you"
         }
     ]
 }
