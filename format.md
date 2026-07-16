@@ -26,9 +26,9 @@ It is also recommended to provide a [`Link:` HTTP response header](https://www.w
 
 All attributes are **optional** unless otherwise specified. Standard attribute names **must** be defined as appearing in `camelCase`.
 
-Attributes starting with a `$` refer to things that are structural to the document, while attributes without this prefix are descriptive of the element itself.
+Attributes starting with a `$` refer to things that are structural to the document, while attributes without this prefix are descriptive of the item itself.
 
-Structural attribute names **must not** be reused by element attribute names; for example, an element **may not** define an attribute named `type`.
+Structural attribute names **must not** be reused by item attribute names; for example, an item **may not** define an attribute named `type`.
 
 Attribute names are to be given in English and written in `camelCase` (first letter of the first word lowercase, no separator between words, additional words capitalized). Embedded acronyms are treated as single words; so for example a theoretical attribute of "HTML AJAX Endpoint" would appear as `htmlAjaxEndpoint`.
 
@@ -96,31 +96,31 @@ Sample implementations for attribute lookup are as below.
 
 ```python
 # Python implementation
-def get_attribute_localized(element:dict, attribute:str, locale:str=None):
+def get_attribute_localized(item:dict, attribute:str, locale:str=None):
     if locale:
         tags = locale.split('-')
         while tags:
             key = f"{attribute}${'-'.join(tags)}"
-            if key in element:
-                return element[key]
+            if key in item:
+                return item[key]
             tags.pop()
-    return element.get(attribute)
+    return item.get(attribute)
 ```
 
 ```js
 // JavaScript implementation
-function getAttributeLocalized(element, attribute, locale) {
+function getAttributeLocalized(item, attribute, locale) {
     if (locale) {
         var tags = locale.split('-')
         while (tags.length) {
             const key = `${attribute}\$${tags.join('-')}`
-            if (element[key]) {
-                return element[key];
+            if (item[key]) {
+                return item[key];
             }
             tags.pop();
         }
     }
-    return element[attribute]
+    return item[attribute]
 }
 ```
 
@@ -175,7 +175,6 @@ All entities support the following attributes:
     If there are multiple descriptors available, the client is free to select the one that is the closest fit for its own display purposes (for example, selecting the most appropriate resolution or aspect ratio).
 
 * `summary`: A short description of the entity, intended to be one single line of plain text
-* `description`: A longer/detailed description of the entity, formatted as [limited HTML](#description-text)
 * `relationship`: A brief explanation of how this entity is related to its containing entity
 
     For example:
@@ -275,42 +274,9 @@ A basic example follows:
 }
 ```
 
-### <span id="markdown">Limited Markdown</span>
+### <span id="lyric-text">Lyric Text</span>
 
-Longer text, such as the `description` attribute, may benefit from a rich text presentation. To this end, display clients such as players **should** render these text fields as [Markdown](https://markdown.org/). The recommended Markdown subset varies by context.
-
-#### <span id="description-text">Descriptions</span>
-
-In descriptions, the following markup types **must** be supported:
-
-* Paragraphs
-
-The following **should** be supported:
-
-* Emphasis
-* Headings
-* Lists
-* Links
-* Quotes
-* Code (both inline and fenced/indented blocks)
-
-The level of support is up to the discretion of the implementer; for example, it is totally valid for an implementation to render it as plain text, or to render links as just the link text (e.g. rendering `[Hello](https://youtu.be/dQw4w9WgXcQ)` as just the string `Hello`).
-
-The following Markdown features **should not** be supported:
-
-* Images
-* Raw HTML tags
-* Tables
-* Footnotes
-* Other extensions
-
-It is up to the implementation as to whether these features should be stripped out entirely or replaced with a plaintext representation.
-
-As a reminder, it is also entirely valid for a receiver to simply ignore the `description` attribute altogether.
-
-#### <span id="lyric-text">Lyrics</span>
-
-In lyrics, the following markup types **should** be supported:
+In lyrics, the following markup types **may** be supported:
 
 * Emphasis
 * Inline code
@@ -388,7 +354,7 @@ Some collections (such as for a record label or a private storage server) will b
 * `previous`: The previous page of the collection, in the event that we are paginating
 * `full`: A URL that contains the full content of the collection, if that's feasible/reasonable
 
-Any changes which occur to elements which appeared on prior pages **must** appear on the page that is current at the time that the change took place. For example, if a piece of music that was published in January of 2020 was deleted in June of 2025, it's the page reflecting June 2025 that would contain the deletion. Similarly, updates to song metadata would occur in the collection at the time that the update happened. In this way, collection consumers do not need to re-traverse the entire backlog of a large collection to get all updates, and can incrementally update only by retrieving the current page and any pages that haven't already been retrieved.
+Any changes which occur to entities which appeared on prior pages **must** appear on the page that is current at the time that the change took place. For example, if a piece of music that was published in January of 2020 was deleted in June of 2025, it's the page reflecting June 2025 that would contain the deletion. Similarly, updates to song metadata would occur in the collection at the time that the update happened. In this way, collection consumers do not need to re-traverse the entire backlog of a large collection to get all updates, and can incrementally update only by retrieving the current page and any pages that haven't already been retrieved.
 
 For this reason, past page URLs should also be stable; if the June 2025 page has a URL of e.g. `https://example.com/Chorus/2025-06.json`, then it should always be at that URL so that a consumer can stop traversing pages once it has encountered an archival URL that it has already processed per HTTP versioning headers (`If-Modified-Since`, `If-None-Match`, etc.).
 
@@ -426,7 +392,7 @@ An entity of type `release` indicates a released item, typically an album contai
 * `featuring`: An array of additional featured [`artist`](#artist)s, to indicate collaborations; these artists may also have additional properties such as:
     * `role`: The role this artist played in the release
 
-Note that an `album` does not necessarily have to be contained by (or have) an `artist` element. In this case, it is up to the consumer to decide how to display this.
+Note that an `album` does not necessarily have to be contained by (or have) an `artist` entity. In this case, it is up to the consumer to decide how to display this.
 
 Valid `$items` types:
 
@@ -454,23 +420,23 @@ It has the following additional properties:
 * `discNum`: The physical disc that the track appeared on, in the case of a multi-disc album
 * `trackNum`: The physical track number for the track on its disc
 
-    Note that `discNum` and `trackNum` are purely for display purposes, and do not affect the natural playback order of the track, which is given by the order of the `track` elements within the containing [`release`](#release)'s `$items`.
+    Note that `discNum` and `trackNum` are purely for display purposes, and do not affect the natural playback order of the track, which is given by the order of the `track` items within the containing [`release`](#release)'s `$items`.
 
 * `copyright`: The copyright information of the album (defaults to the containing [`release`](#release)'s)
 * `license`: Any additional license information, e.g. `"CC by-nc-sa"` (defaults to the containing [`release`](#release)'s)
 
 * `lyrics`: The human-readable, non-synchronized lyrics of the track, if any; this should be provided as plain text with a single `\n` between lines, and `\n\n` between verses. [Lyric Markdown](#lyric-text) (such as `*emphasis*` and `**boldface**`) **may** be supported at the discretion of the consumer.
-* `synchronizedLyrics`: Synchronized lyrics, given as a list of elements with the following properties:
+* `synchronizedLyrics`: Synchronized lyrics, given as a list of items with the following properties:
     * `startTime`: The starting [timestamp](#timestamp) of the lyric; **required**
     * `duration`: The [duration](#duration) of the lyric; **strongly recommended**
-    * `voice`: The name of the voice that is singing/stating the lyric; this **should** be human-readable, and **must** be consistent throughout the track
-    * `text`: The representative text of the lyric, in [lyric Markdown](#lyric-text); **required**
-    * `color`: A recommended color for the display of the lyric, given as a common color name or hex code
 
-    Note that lyrics may overlap (such as in the case of duets or staggered multi-part vocals).
+        Note that lyrics may overlap (such as in the case of duets or staggered multi-part vocals), so if `duration` is not specified it must be inferred by the length of the text, *not* by the start time of the next lyric.
+
+    * `voice`: The name of the voice that is singing/stating the lyric; if provided, this **should** be human-readable, and **must** be consistent throughout the track
+    * `text`: The representative text of the lyric, in [lyric Markdown](#lyric-text); **required**
 
 * `genre`: An arbitrary string of text that may indicate vaguely what sorts of people might like this track (defaults to the containing `release`'s if unspecified)
-* `markers`: An array of markers to indicate different sections of a track, such as movements, chapters, or other similar metadata. Each array element contains the following properties:
+* `markers`: An array of marker items to indicate different sections of a track, such as movements, chapters, or other similar metadata. Each array item contains the following properties:
 
     * `timestamp`: The time, in seconds, that the marker appears (relative to the start of the track); **required**
     * `text`: The text label of the marker; **required**
@@ -621,7 +587,7 @@ Valid `$items` types:
 
 An `events` entity represents a time-based event feed to indicate interaction events. It is similar to a `playlist` but is meant to be ephemeral in nature.
 
-The intention is that an individual user could publish a Chorus collection containing an `events` element as part of a greater recommendation system (with users subscribing to each others' feeds), and be similar to a "scrobbling" system such as [Last.fm](https://last.fm/), [Libre.fm](https://libre.fm/), or [ListenBrainz](https://listenbrainz.org/). However, its inclusion is only tentative and it is probably better for social elements to be in their own purpose-specific feed format that is expressed by e.g. ActivityPub, Atom, RSS, or similar.
+The intention is that an individual user could publish a Chorus collection containing an `events` entity as part of a greater recommendation system (with users subscribing to each others' feeds), and be similar to a "scrobbling" system such as [Last.fm](https://last.fm/), [Libre.fm](https://libre.fm/), or [ListenBrainz](https://listenbrainz.org/). However, its inclusion is only tentative and it is probably better for social elements to be in their own purpose-specific feed format that is expressed by e.g. ActivityPub, Atom, RSS, or similar.
 
 It provides the following properties:
 
