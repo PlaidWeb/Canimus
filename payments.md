@@ -1,4 +1,4 @@
-# Federated payments
+# Decentralized payments
 
 Payments are the worst part of the streaming ecosystem and the area most subject to abuse. Global money pools that are split up on a per-stream basis encourage bot listeners and ultra-short content, and pooling payments across listeners means that disproportionate numbers of listens from single users will give an outsized influence on the payments sent to the artists they listen to, at the expense of other artists.
 
