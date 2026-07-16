@@ -57,14 +57,6 @@ An "item" is a collection of key-value pairs ("attributes"). It corresponds to t
 * PHP: `array` (with named keys)
 * Perl: `hash`
 
-### <span id="uid">Identifier</span>
-
-An identifier uniquely and permanently refers to an entity within a collection. It is a textual string, and may include any printable character. It may or may not be human-readable, but the comparison between identifiers **must** be based on an exact match.
-
-It is **recommended** that implementations avoid using whitespace characters or characters which require escaping in the serialization format (such as quotes or angle brackets).
-
-Identifiers **must not** change due to changes in the underlying entity's attributes. For that reason it is **recommended** that an identifier be generated and permanently associated with an entity at the time of its creation. [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier)s are a good choice in general, UUID-4 and UUID-5 in particular.
-
 #### <span id="localization">Localization</span>
 
 Localization follows the [IETF BCP 47](https://www.rfc-editor.org/info/bcp47) standard.
@@ -131,6 +123,14 @@ function getAttributeLocalized(element, attribute, locale) {
     return element[attribute]
 }
 ```
+
+### <span id="uid">Identifier</span>
+
+An identifier uniquely and permanently refers to an entity within a collection. It is a textual string, and may include any printable character. It may or may not be human-readable, but the comparison between identifiers **must** be based on an exact match.
+
+It is **recommended** that implementations avoid using whitespace characters or characters which require escaping in the serialization format (such as quotes or angle brackets).
+
+Identifiers **must not** change due to changes in the underlying entity's attributes. For that reason it is **recommended** that an identifier be generated and permanently associated with an entity at the time of its creation. [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier)s are a good choice in general, UUID-4 and UUID-5 in particular.
 
 ### <span id="entity">Entity</span>
 
