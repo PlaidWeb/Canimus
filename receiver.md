@@ -28,9 +28,9 @@ A good starting point header value, for clients which only can parse the JSON fe
 
     Accept: application/chorus+json, application/json;q=0.75, */*;q=0.1
 
-If you can also parse YAML, then you could do:
+If you can also parse XML, then you could do:
 
-    Accept: application/chorus+json, application/chorus+yaml, application/json;q=0.75, application/yaml;q=0.5, */*;q=0.1
+    Accept: application/chorus+json, application/chorus+xml, application/json;q=0.75, application/xml;q=0.5, */*;q=0.1
 
 And so on.
 
