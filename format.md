@@ -128,9 +128,9 @@ function getAttributeLocalized(item, attribute, locale) {
 
 An identifier uniquely and permanently refers to an entity within a collection. It is a textual string, and may include any printable character. It may or may not be human-readable, but the comparison between identifiers **must** be based on an exact match.
 
-It is **recommended** that implementations avoid using whitespace characters or characters which require escaping in the serialization format (such as quotes or angle brackets).
+Identifier names **must** be limited to URI-safe characters: `[A-Za-z0-9:/?#\[\]@!$'()*+,;=._~%-]`
 
-Identifiers **must not** change due to changes in the underlying entity's attributes. For that reason it is **recommended** that an identifier be generated and permanently associated with an entity at the time of its creation. [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier)s are a good choice in general, UUID-4 and UUID-5 in particular.
+Identifiers **must not** change due to changes in the underlying entity's attributes. For that reason it is **recommended** that an identifier be generated and permanently associated with an entity at the time of its creation. [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier)s are a good choice in general, UUID-4 in particular.
 
 ### <span id="entity">Entity</span>
 
