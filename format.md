@@ -276,10 +276,10 @@ A basic example follows:
 
 ### <span id="lyric-text">Lyric Text</span>
 
-In lyrics, the following markup types **may** be supported:
+In lyrics, the following Markdown-style markup types **may** be supported:
 
-* Emphasis
-* Inline code
+* Emphasis (e.g. `*italic*`, `**bold**`)
+* Inline code (e.g. `` `i am a robot bleep blorp` ``)
 
 It is valid for an implementation to display lyric text as the raw string.
 
@@ -425,7 +425,7 @@ It has the following additional properties:
 * `copyright`: The copyright information of the album (defaults to the containing [`release`](#release)'s)
 * `license`: Any additional license information, e.g. `"CC by-nc-sa"` (defaults to the containing [`release`](#release)'s)
 
-* `lyrics`: The human-readable, non-synchronized lyrics of the track, if any; this should be provided as plain text with a single `\n` between lines, and `\n\n` between verses. [Lyric Markdown](#lyric-text) (such as `*emphasis*` and `**boldface**`) **may** be supported at the discretion of the consumer.
+* `lyrics`: The human-readable, non-synchronized lyrics of the track, if any; this should be provided as plain text with a single `\n` between lines, and `\n\n` between verses. [Limited Markdown](#lyric-text) (such as `*emphasis*` and `**boldface**`) **may** be supported at the discretion of the consumer.
 * `synchronizedLyrics`: Synchronized lyrics, given as a list of items with the following properties:
     * `startTime`: The starting [timestamp](#timestamp) of the lyric; **required**
     * `duration`: The [duration](#duration) of the lyric; **strongly recommended**
@@ -433,7 +433,7 @@ It has the following additional properties:
         Note that lyrics may overlap (such as in the case of duets or staggered multi-part vocals), so if `duration` is not specified it must be inferred by the length of the text, *not* by the start time of the next lyric.
 
     * `voice`: The name of the voice that is singing/stating the lyric; if provided, this **should** be human-readable, and **must** be consistent throughout the track
-    * `text`: The representative text of the lyric, in [lyric Markdown](#lyric-text); **required**
+    * `text`: The representative text of the lyric, in [limited Markdown](#lyric-text); **required**
 
 * `genre`: An arbitrary string of text that may indicate vaguely what sorts of people might like this track (defaults to the containing `release`'s if unspecified)
 * `markers`: An array of marker items to indicate different sections of a track, such as movements, chapters, or other similar metadata. Each array item contains the following properties:
