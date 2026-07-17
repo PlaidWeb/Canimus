@@ -140,7 +140,7 @@ All entities support the following attributes:
 
 * `$type`: The type of entity being defined; **required**
 * `$id`: An opaque, permanent string [identifier](#uid) to uniquely identify this entity relative to this collection; **strongly recommended**
-* `$items`: A list of items that are contained by this entity; an item may be another entity, or an [entity reference](#entity-reference)
+* `$items`: A list of items that are referenced by this entity; an item may be another entity, or an [entity reference](#entity-reference)
 * `$lang`: The default [localization](#localization) for display strings; defaults to the `$lang` of the containing entity
 
     It is **strongly recommended** that entities provide a `$lang`, so that localization-aware clients will know what the default localization refers to. This is useful for things such as automatic translation or displaying metadata about the item's language of origin.
@@ -273,9 +273,11 @@ A basic example follows:
 }
 ```
 
-Note that an entity *can* indirectly contain an item that is a `$ref` back to itself, such as in the case of an [`artist`](#artist) containing an [`album`](#album) that contains a [`track`](#track) that has an `artist` that is a `$ref` back to the artist with an alternate display name.
+### <span id="structure">Structural relationship</span>
 
-That is to say that a Chorus document is not defining a hierarchical tree that must be expanded fully; instead, it defines separate entities with a many-to-many relationship between them, and the containment structure is as a matter of convenience to the publisher in order to limit the amount of repeated information needed to express those relationships.
+A Chorus document does not define a hierarchical tree that must be expanded fully; instead, it defines separate entities with a many-to-many relationship between them, and the containment structure is as a matter of convenience to the publisher in order to limit the amount of repeated information needed to express those relationships.
+
+That is to say that an entity's `$items` *can* directly or indirectly contain an item that is a `$ref` back to itself, such as in the case of an [`artist`](#artist) containing an [`album`](#album) that contains a [`track`](#track) that has an `artist` that is a `$ref` back to the artist with an alternate display name.
 
 For example, this document:
 
