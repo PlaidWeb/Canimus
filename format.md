@@ -435,8 +435,9 @@ An entity of type `release` indicates a released item, typically an album contai
 * `label`: The [`label`](#label) that owns/manages this release. If not specified, it uses any [`label`](#label) associated with the [`artist`](#artist).
 * `artist`: The primary [`artist`](#artist) that owns/manages this release (also known as "album artist"). If not specified, it uses the [`artist`](#artist) that contains this `release`, if any.
 * `subtitle`: The subtitle of the release
-* `copyright`: The copyright information of the release
-* `license`: Any additional license information, e.g. `"CC by-nc-sa"`
+* `copyright`: The base copyright information of the release
+* `license`: Additional license information, e.g. `"CC by-nc-sa"`
+* `licenseUrl`: A link to the additional license information, e.g. `"https://creativecommons.org/licenses/by-nc-sa/4.0/"`
 * `genre`: An arbitrary string of text that may indicate vaguely what sorts of people might like this release
 * `featuring`: An array of additional featured [`artist`](#artist)s, to indicate collaborations; these artists may also have additional properties such as:
     * `role`: The role this artist played in the release
@@ -473,6 +474,7 @@ It has the following additional properties:
 
 * `copyright`: The copyright information of the album (defaults to the containing [`release`](#release)'s)
 * `license`: Any additional license information, e.g. `"CC by-nc-sa"` (defaults to the containing [`release`](#release)'s)
+* `licenseUrl`: A link to the additional license information, e.g. `"https://creativecommons.org/licenses/by-nc-sa/4.0/"` (defaults to the containing [`release`](#release)'s)
 
 * `lyrics`: The human-readable, non-synchronized lyrics of the track, if any; this should be provided as plain text with a single `\n` between lines, and `\n\n` between verses. [Limited Markdown](#lyric-text) (such as `*emphasis*` and `**boldface**`) **may** be supported at the discretion of the consumer.
 * `synchronizedLyrics`: Synchronized lyrics, given as a list of items with the following properties:
