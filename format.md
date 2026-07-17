@@ -435,7 +435,7 @@ An entity of type `release` indicates a released item, typically an album contai
 * `label`: The [`label`](#label) that owns/manages this release. If not specified, it uses any [`label`](#label) associated with the [`artist`](#artist).
 * `artist`: The primary [`artist`](#artist) that owns/manages this release (also known as "album artist"). If not specified, it uses the [`artist`](#artist) that contains this `release`, if any.
 * `subtitle`: The subtitle of the release
-* `copyright`: The base copyright information of the release
+* `copyright`: The base copyright information of the release (e.g. `"℗2025 MecaGorp Ultd; ©2025 Jennifer Example"`)
 * `license`: Additional license information, e.g. `"CC by-nc-sa"`
 * `licenseUrl`: A link to the additional license information, e.g. `"https://creativecommons.org/licenses/by-nc-sa/4.0/"`
 * `genre`: An arbitrary string of text that may indicate vaguely what sorts of people might like this release
