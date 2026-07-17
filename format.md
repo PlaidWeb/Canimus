@@ -163,7 +163,7 @@ All entities support the following attributes:
 
     * `thumb`: A representative icon for the item (such as a logo)
     * `main`: Primary artwork to be displayed in a player (primarily relevant to an album or track, but can also be used as a band fallback for things without artwork, for example)
-    * `photo`: A larger photographic image representing the item (headshots, profile images, etc.)
+    * `poster`: A larger photographic image representing the item (headshots, profile images, etc.)
 
     Each of the image descriptors is an [item](#item) with the following attributes:
 
@@ -208,7 +208,6 @@ All entities support the following attributes:
         * `support`: Indicates that this URL is where a listener may provide financial support to the artist
         * `purchase`: Indicates that this URL is where a listener may obtain a copy of this content
         * `video`: A place to see a music video for this content
-        * `icon`: A small image to represent the link, formatted the same way as it would be in `images`
         * `license`: A full description of the license terms for the item
 
         Note that more link relationships may be added in the future as additional needs are identified; as such, a link with an unknown `rel` should be either ignored or collected as an "other" type.
@@ -219,11 +218,11 @@ All entities support the following attributes:
 
 Some [entities](#entity) need to appear multiple times in a collection. For example, artists with their own discographies may also appear in one or more tracks on compilation albums, or may be featured artists on another artist's releases. Similarly, one track may appear in multiple places, such as a label's compilation or in a playlist.
 
-An entity reference is an item with a `$ref` that matches the `$id` of the original entity. Any additional properties will override those from the original `$id` without affecting the original, essentially modifying a copy. An entity reference **must not** have `$id` or `$type` attributes.
+An entity reference is an item with a `$ref` that matches the `$id` of the original entity. Any additional properties will override those from the original `$id` without affecting the original, essentially modifying a copy. An entity reference **must not** have `$id`, `$type`, or `$items` attributes.
 
 If a `$ref` appears, its corresponding `$id` ***must*** appear in the same Chorus document.
 
-An entity reference is considered to have the same `$type` as the underlying entity, and should be validated accordingly.
+An entity reference is considered to have the same `$type` as the referenced entity, and should be validated accordingly.
 
 A basic example follows:
 
@@ -274,6 +273,56 @@ A basic example follows:
 }
 ```
 
+Note that an entity *can* indirectly contain an item that is a `$ref` back to itself, such as in the case of an [`artist`](#artist) containing an [`album`](#album) that contains a [`track`](#track) that has an `artist` that is a `$ref` back to the artist with an alternate display name.
+
+That is to say that a Chorus document is not defining a hierarchical tree that must be expanded fully; instead, it defines separate entities with a many-to-many relationship between them, and the containment structure is as a matter of convenience to the publisher in order to limit the amount of repeated information needed to express those relationships.
+
+For example, this document:
+
+```json
+{
+    "$type": "container",
+    "$items": [{
+        "$type": "artist",
+        "$id": "my-artist",
+        "$items": [{
+            "$type": "album",
+            "$id": "my-album",
+            "$items": [{
+                "$type": "track",
+                "$id": "my-track"
+            }]
+        }]
+    }]
+}
+```
+
+is semantically-equivalent to this document:
+
+```json
+{
+    "$type": "container",
+    "$items": [{
+        "$type": "artist",
+        "$id": "my-artist",
+        "$items": [{
+            "$ref": "my-album"
+        }]
+    }, {
+        "$type": "album",
+        "$id": "my-album",
+        "$items": [{
+            "$ref": "my-track"
+        }]
+    }, {
+        "$type": "track",
+        "$id": "my-track"
+    }]
+}
+```
+
+Both define three elements: an [`artist`](#artist) with a single [`album`](#album) which contains a single [`track`](#track). The serialized structure is different, but the meaning is the same.
+
 ### <span id="lyric-text">Lyric Text</span>
 
 In lyrics, the following Markdown-style markup types **may** be supported:
@@ -287,18 +336,18 @@ Raw HTML tags ***must not*** be supported; in contexts where the text display is
 
 ### <span id="datetime">Dates and times</span>
 
-Dates and times are represented as strings in `YYYY[-MM[-DD[ hh:mm[:ss][+ZZZZ]]]]` format. For example, `2026-06-14 14:42-0700` is equivalent to June 14, 2026 at 2:42 PM in UTC-0700 (e.g. Pacific Daylight Time).
+Dates and times are represented as strings in `YYYY[-MM[-DD[Thh:mm[:ss][+ZZZZ]]]]` format. For example, `2026-06-14T14:42-0700` is equivalent to June 14, 2026 at 2:42 PM in UTC-0700 (e.g. Pacific Daylight Time). This format is similar to [RFC 3339](https://www.rfc-editor.org/info/rfc3339/), but allows the date to be precise only to a month or year, as is (unfortunately) common in a lot of music history.
 
 If a given time lacks timezone information, it will be assumed to be UTC; `14:06:02` and `14:06:02+0000` are therefore equivalent.
 
-A consumer **should** make use of all available precision, but it is not specified how it treats varying levels of precision; for example:
+A consumer **should** make use of all available precision, but it is not specified how it treats partial matches between two datetimes with differing levels of precision; for example:
 
-* It is not specified how `2026-06-14 12:34`, `2026-06-14`, `2026-06`, and `2026` sort relative to one another
+* It is not specified how `2026-06-14T12:34`, `2026-06-14`, `2026-06`, and `2026` sort relative to one another
 * `2026-06` must always come after `2026-05` and `2026-05-30`
 
 Per the above, dates may be trivially sorted and filtered lexically, but fully-specified datetimes need to be timezone-aware.
 
-### <span id="duration">Durations</span> and <span id="timestamps">timestamps</span>
+### <span id="duration">Durations</span> and <span id="timestamp">timestamps</span>
 
 Durations and timestamps are given numerically as seconds, and **must** be serialized as a number. So, for example, a duration of 1 hour, 23 minutes, and 45.6 seconds is serialized as the number `5025.6`.
 
@@ -329,7 +378,7 @@ The top-level entity **should** have a type of `collection`. A `collection` enti
 The `collection` entity can contain the following additional attributes:
 
 * `$protocol`: Refers to the protocol of the file, i.e. `"Chorus"`
-* `$version`: Refers to the base Chorus specification version in effect, e.g. "v0.2.5"
+* `$version`: Refers to the base Chorus specification version in effect, e.g. "0.2.5"
 * `$schema`: A URL to a JSON Schema reflective of the version of the protocol in use
 * `$deleted`: Items that have been previously published but are now removed from the collection, given as a list of `$id` values
 
