@@ -8,7 +8,7 @@ Music discovery, consumption, and streaming is locked down by large corporations
 
 There are several disparate attempts to build a better world for musicians, but many of them are built on protocols that were not designed for this use case in mind. ActivityPub and RSS were simply not designed with the specific needs of distribution and discovery of musical content, and most of the existing attempts are built on top of those.
 
-The Chorus format is a lightweight, web-native protocol that enables an ecosystem of independent music streaming, directly connecting musicians with listeners and removing the entrenched music industry from the equation. This allows us to build a better future for independent music on the Internet where musicians can publish directly to listeners.
+The Chorus format is a lightweight, web-native protocol that enables an ecosystem of independent music streaming, directly connecting musicians with listeners and removing the entrenched music industry from the equation. This allows us to build a better future for independent music on the Internet while reducing the headache for musicians.
 
 This is an expansion of the ideas brainstormed in "[A fair independent streaming platform](https://beesbuzz.biz/blog/11155-A-fair-independent-streaming-platform)."
 
