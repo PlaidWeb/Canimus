@@ -1,10 +1,10 @@
 # Chorus
 
-Chorus is a lightweight syndication format to allow for federated music discovery and streaming in a platform- and distribution-agnostic manner.
+Chorus is a lightweight syndication format for federated music discovery and streaming in a platform- and distribution-agnostic manner.
 
 ## Rationale
 
-Music discovery, consumption, and streaming is locked down by large corporations that have made a mess of things. The streaming providers have to cater to the whims of the major record labels, and have created a two-tier system where neither discovery nor payments are even remotely fair. Independent musicians are hit hardes by this, as they have to pay money to play a game that is stacked against them, and what little listenership they get is largely divvied up to the major labels. The specific payment strategy that's used has also led to a glut of minimum-effort content and AI slop and bot-driven streaming that tries to game the system, hurting everyone, big and small alike.
+Music discovery, consumption, and streaming are locked down by large corporations that have made a mess of things. The streaming providers have to cater to the whims of the major record labels, and have created a two-tier system where neither discovery nor payments are even remotely fair. Independent musicians are hit hardes by this, as they have to pay money to play a game that is stacked against them, and what little listenership they get is largely divvied up to the major labels. The specific payment strategy that's used has also led to a glut of minimum-effort content and AI slop and bot-driven streaming that tries to game the system, hurting everyone, big and small alike.
 
 There are several disparate attempts to build a better world for musicians, but many of them are built on protocols that were not designed for this use case in mind. ActivityPub and RSS were simply not designed with the specific needs of distribution and discovery of musical content, and most of the existing attempts are built on top of those.
 
@@ -72,6 +72,16 @@ There are several ActivityPub-based music federation projects underway as well. 
 Any implementation of a music collection on top of ActivityPub would still have to implement the collection itself, and maintain standards for how backfilling works and how the collection is shaped, so why not start with a clean implementation that only provides the parts that are important to a music collection to begin with?
 
 ActivityPub itself also doesn't solve the issues of interoperability between different implementations; notably, existing ActivityPub implementations such as Bandwagon, Funkwhale, and PeerTube which all live in the same general problem domain still cannot meaningfully share data with one another, as they speak different vocabularies. Even different versions of the same ActivityPub implementation are not guaranteed to interoperate with one another.
+
+### What about [OpenSubsonic](https://opensubsonic.netlify.app/)?
+
+OpenSubsonic is a pretty good protocol for connecting players to collections! However, it is really built around there being a single collection that's being provided to a user's player, and most players do not support aggregating across multiple OpenSubsonic collections.
+
+What makes a lot of sense is having a single OpenSubsonic collection server that aggregates other sources, including Chorus (acting as a receiver) and other OpenSubsonic implementations, providing a unified library to the user's endpoint.
+
+In this world, Chorus connects collections to sources, and OpenSubsonic connects players to collections.
+
+Basically, OpenSubsonic is solving a different part of the stack, and it absolutely complements Chorus. The two protocols can work together to form a greater whole.
 
 ### Why not microformats?
 
