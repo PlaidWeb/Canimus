@@ -149,15 +149,9 @@ All entities support the following attributes:
 
 * `url`: The canonical [URL](#url) for an HTML representation of the current entity, e.g. the webpage for the label/artist/release/track
 * `name`: The common name of the entity
+* `lastModified`: The last-modified time of this entity, as a [datetime](#datetime)
 
-* `releaseDate`: The original release date, as a [datetime](#datetime)
-* `updatedDate`: The most recent update, as a [datetime](#datetime)
-
-    For both of these, partial dates are acceptable in the event that only the year or year and month are available.
-
-    For consistency, this **should** be serialized as a string even if the serialization format natively supports datetimes (e.g. YAML).
-
-* `images`: A collection of images that are relevant to the display of the content. This is to be stored as a key-value dictionary, where the key is the type of image, and the value is an array of image descriptors.
+* `images`: A collection of images that are relevant to the display of this entity. This is to be stored as a key-value dictionary, where the key is the type of image, and the value is an array of image descriptors.
 
     Possible keys include (but are not limited to):
 
@@ -218,7 +212,10 @@ All entities support the following attributes:
 
 Some [entities](#entity) need to appear multiple times in a collection. For example, artists with their own discographies may also appear in one or more tracks on compilation albums, or may be featured artists on another artist's releases. Similarly, one track may appear in multiple places, such as a label's compilation or in a playlist.
 
-An entity reference is an item with a `$ref` that matches the `$id` of the original entity. Any additional properties will override those from the original `$id` without affecting the original, essentially modifying a copy. An entity reference **must not** have `$id`, `$type`, or `$items` attributes.
+An entity reference is an item with a `$ref` that matches the `$id` of the original entity. It may also have the following additional attributes:
+
+* `name`: The display name in the referenced context
+* `relationship`: An explanation of the reference relationship
 
 If a `$ref` appears, its corresponding `$id` ***must*** appear in the same Chorus document.
 
@@ -434,6 +431,7 @@ Valid `$items` types:
 
 An entity of type `release` indicates a released item, typically an album containing one or more [`track`](#track)s. The `name` attribute refers to the title of the release. It contains the following additional properties:
 
+* `releaseDate`: The original release date, as a [datetime](#datetime)
 * `label`: The [`label`](#label) that owns/manages this release. If not specified, it uses any [`label`](#label) associated with the [`artist`](#artist).
 * `artist`: The primary [`artist`](#artist) that owns/manages this release (also known as "album artist"). If not specified, it uses the [`artist`](#artist) that contains this `release`, if any.
 * `subtitle`: The subtitle of the release
