@@ -76,7 +76,7 @@ Alternate localizations are given by appending `$code` to the attribute name; fo
 
 Even if an attribute is fully localized, it **must** still provide a version without a locale suffix, as localization is considered optional.
 
-Note that any attribute may be localized, which also allows for multiple language and region support for images, media renditions, and so on.
+Note that any descriptive (i.e. non-structrual) attribute may be localized, which also allows for multiple language and region support for images, media renditions, and so on. Structural attributes (ones that start with a `$`) **must not** be localized.
 
 The lookup algorithm is defined by [RFC 4647](https://datatracker.ietf.org/doc/rfc4647/). Namely, localized strings must be looked up based on exact matches, from most specific to least; for example, if the attribute `name` is requested in locale `en-US`, then the attribute should be looked up as `name$en-US`, `name$en`, and then finally `name`. A locale of `en-US` shall never receive a string for `en-UK`.
 
@@ -139,7 +139,7 @@ An "entity" is an [item](#item) that represents a concrete object in the collect
 All entities support the following attributes:
 
 * `$type`: The type of entity being defined; **required**
-* `$id`: An opaque, permanent string [identifier](#uid) to uniquely identify this entity relative to this collection; **strongly recommended**
+* `$id`: An opaque, permanent string [identifier](#uid) to uniquely identify this entity relative to this collection; **required** (*except* on `collection` itself)
 * `$items`: A list of items that are referenced by this entity; an item may be another entity, or an [entity reference](#entity-reference)
 * `$lang`: The default [localization](#localization) for display strings; defaults to the `$lang` of the containing entity
 
@@ -520,11 +520,13 @@ An example track might look like:
 
     "artist": {
         "$type": "artist",
+        "$id": "5ee2099f-8d04-48c8-bc3d-832d3b0b58cc",
         "name": "The Example Band"
     },
     "featuring": [
         {
             "$type": "artist",
+            "$id": "b96b4398-1845-43b4-89e8-76b8409f1fbf",
             "name": "Another Band"
         },{
             "$ref": "yet-another-band"
@@ -584,7 +586,7 @@ An example track might look like:
 
 ==NOTE:== This section of the specification is especially rough and likely to change.
 
-A curated list of music to listen to, including tracks and albums. This can be useful for an artist to publish a "best of" or a mixtape or the like. It has the following additional properties:
+A `playlist` is a curated list of music to listen to, including tracks and albums. This can be useful for an artist to publish a "best of" or a mixtape or the like. It has the following additional properties:
 
 * `author`: The author of the playlist
 
@@ -599,29 +601,29 @@ For example:
     "author": "Example Curator",
     "$items": [{
         "$type": "track",
-        "artist": {"name": "Example Band"},
+        "$id": "efd71467-3b9c-483c-a081-175f6a6f1a74",
+        "artist": {"name": "Example Band", "$id": "85eea5d9-8fc9-45e9-84c8-bb98a4885502"},
         "name": "Hit Single",
         "subtitle": "So tired",
         "duration": 120,
-        "album": "Self-Titled Album",
+        "release": {"name": "Self-Titled Album", "$id": "72dd45e7-3192-4c63-8719-0e25043abf90"},
         "url": "https://example.com/band/releases/hit-single.html",
         "media": [{
             "contentType": "audio/mp3",
             "src": "https://cdn.example.com/artist/album/07 hit single.mp3",
             "size": 2949120
-        }],
-        "$id": "efd71467-3b9c-483c-a081-175f6a6f1a74"
+        }]
     }, {
         "$type": "track",
-        "artist": {"name": "Another band"},
+        "$id": "1120a795-e51b-4666-b8f5-1904dd8b568f",
+        "artist": {"name": "Another band", "$id": "72d1a8ef-6396-4c7f-8758-f7d527368eab"},
         "name": "A bigger fish to fry",
         "url": "https://example.com/other-band/fish.html",
         "media": [{
             "contentType": "audio/mp3",
             "src": "https://cdn.example.com/other-band/fish.mp3",
             "size": 2949120
-        }],
-        "$id": "1120a795-e51b-4666-b8f5-1904dd8b568f"
+        }]
     }]
 }
 ```

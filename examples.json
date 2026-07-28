@@ -90,6 +90,7 @@
                 },
                 {
                     "$type": "release",
+                    "$id": "album-selftitled",
                     "name": "Self-Titled Album",
                     "url": "https://example.band/album/self-titled",
                     "description": "This album has three tracks on it.",
@@ -101,6 +102,7 @@
                         {
                             "$comment": "This track is available en Español",
                             "$type": "track",
+                            "$id": "selftitled-track-1",
                             "name": "First track",
                             "name$es": "Canción primera",
                             "url": "https://example.band/track/first-track",
@@ -125,6 +127,7 @@
                         },
                         {
                             "$type": "track",
+                            "$id": "selftitled-track-2",
                             "name": "Second track",
                             "url": "https://example.band/track/second-track",
                             "media": [
@@ -140,6 +143,7 @@
                         },
                         {
                             "$type": "track",
+                            "$id": "selftitled-track-4",
                             "name": "Next track",
                             "url": "https://example.band/track/third-track",
                             "media": [
@@ -152,6 +156,7 @@
                         },
                         {
                             "$type": "track",
+                            "$id": "selftitled-track-5",
                             "name": "Piano Sonata No.20, Op.49 No.2",
                             "composer": "Ludwig Van Beethoven",
                             "duration": 971,
@@ -186,6 +191,7 @@
                         },
                         {
                             "$type": "track",
+                            "$id": "selftitled-track-6",
                             "name": "Final track",
                             "url": "https://example.band/track/final-track",
                             "featuring": [
@@ -218,6 +224,7 @@
         },
         {
             "$type": "release",
+            "$id": "album-big-collab",
             "name": "Our Collaboration",
             "url": "https://example.band/collabs/our-collaboration",
             "description": "A bunch of us got together to record an album in a weekend.",
@@ -225,9 +232,10 @@
                 "$ref": "lbl-mecagorp",
                 "name": "MecaGorp ConHugeCo"
             },
-            "children": [
+            "$items": [
                 {
                     "$type": "track",
+                    "$id": "collab-track-1",
                     "artist": {
                         "name": "Example Band",
                         "$ref": "1234-exampleband"
@@ -242,6 +250,7 @@
                 },
                 {
                     "$type": "track",
+                    "$id": "collab-track-2",
                     "artist": {
                         "name": "Collaborating band 1",
                         "$ref": "collab-band-1"
@@ -256,6 +265,7 @@
                 },
                 {
                     "$type": "track",
+                    "$id": "collab-track-3",
                     "artist": {
                         "name": "Collaborating band 2",
                         "$ref": "collab-band-2"
