@@ -158,7 +158,7 @@ All entities support the following attributes:
     Possible keys include (but are not limited to):
 
     * `thumb`: A representative icon for the item (such as a logo)
-    * `main`: Primary artwork to be displayed in a player (primarily relevant to an album or track, but can also be used as a band fallback for things without artwork, for example)
+    * `main`: Primary artwork to be displayed in a player (primarily relevant to a release or track, but can also be used as a band fallback for things without artwork, for example)
     * `poster`: A larger photographic image representing the item (headshots, profile images, etc.)
 
     Each of the image descriptors is an [item](#item) with the following attributes:
@@ -211,7 +211,7 @@ All entities support the following attributes:
 
 ### <span id="entity-reference">Entity reference</span>
 
-Some [entities](#entity) need to appear multiple times in a collection. For example, artists with their own discographies may also appear in one or more tracks on compilation albums, or may be featured artists on another artist's releases. Similarly, one track may appear in multiple places, such as a label's compilation or in a playlist.
+Some [entities](#entity) need to appear multiple times in a collection. For example, artists with their own discographies may also appear in one or more tracks on compilation releases, or may be featured artists on another artist's releases. Similarly, one track may appear in multiple places, such as a label's compilation or in a playlist.
 
 An entity reference is an item with a `$ref` that matches the `$id` of the original entity. It may also have the following additional attributes:
 
@@ -275,7 +275,7 @@ A basic example follows:
 
 A Chorus document does not define a hierarchical tree that must be expanded fully; instead, it defines separate entities with a many-to-many relationship between them, and the containment structure is as a matter of convenience to the publisher in order to limit the amount of repeated information needed to express those relationships.
 
-That is to say that an entity's `$items` *can* directly or indirectly contain an item that is a `$ref` back to itself, such as in the case of an [`artist`](#artist) containing an [`album`](#album) that contains a [`track`](#track) that has an `artist` that is a `$ref` back to the artist with an alternate display name.
+That is to say that an entity's `$items` *can* directly or indirectly contain an item that is a `$ref` back to itself, such as in the case of an [`artist`](#artist) containing a [`release`](#release) that contains a [`track`](#track) that has an `artist` that is a `$ref` back to the artist with an alternate display name.
 
 For example, this document:
 
@@ -321,7 +321,7 @@ is semantically-equivalent to this document:
 }
 ```
 
-Both define three elements: an [`artist`](#artist) with a single [`album`](#album) which contains a single [`track`](#track). The serialized structure is different, but the meaning is the same.
+Both define three elements: an [`artist`](#artist) with a single [`release`](#release) which contains a single [`track`](#track). The serialized structure is different, but the meaning is the same.
 
 ### <span id="lyric-text">Lyric Text</span>
 
@@ -443,7 +443,7 @@ An entity of type `release` indicates a released item, typically an album contai
 * `featuring`: An array of additional featured [`artist`](#artist)s, to indicate collaborations; these artists may also have additional properties such as:
     * `role`: The role this artist played in the release
 
-Note that an `album` does not necessarily have to be contained by (or have) an `artist` entity. In this case, it is up to the consumer to decide how to display this.
+Note that a `release` does not necessarily have to be contained by (or have) an `artist` entity. In this case, it is up to the consumer to decide how to display this.
 
 Valid `$items` types:
 
@@ -452,7 +452,7 @@ Valid `$items` types:
 
 ### <span id="track">Track</span>
 
-An entity of type `track` refers to a playable track. If it is contained by a [`release`](#release), then it is given a playback order based on its position in the album's `$items`; otherwise it may be assumed to be a single.
+An entity of type `track` refers to a playable track. If it is contained by a [`release`](#release), then it is given a playback order based on its position in the release's `$items`; otherwise it may be assumed to be a single.
 
 It is **RECOMMENDED** (but not required) that released singles be a [`release`](#release) containing a single `track`, and that any `track`s that are not contained by a [`release`](#release) still appear in the relevant [`artist`](#artist)'s discography.
 
@@ -473,7 +473,7 @@ It has the following additional properties:
 
     Note that `discNum` and `trackNum` are purely for display purposes, and do not affect the natural playback order of the track, which is given by the order of the `track` items within the containing [`release`](#release)'s `$items`.
 
-* `copyright`: The copyright information of the album (defaults to the containing [`release`](#release)'s)
+* `copyright`: The copyright information of the track (defaults to the containing [`release`](#release)'s)
 * `license`: Any additional license information, e.g. `"CC by-nc-sa"` (defaults to the containing [`release`](#release)'s)
 * `licenseUrl`: A link to the additional license information, e.g. `"https://creativecommons.org/licenses/by-nc-sa/4.0/"` (defaults to the containing [`release`](#release)'s)
 
