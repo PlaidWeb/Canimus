@@ -22,7 +22,5 @@ Note that different pages of a Chorus collection are considered to be separate d
 
 ## Implementation notes
 
-On the first retrieval of a collection, if the `full` link is provided, the receiver **SHOULD** use that for the initial population, as that will typically require much less processing for both the receiver and the publisher.
-
 When updating a collection, a receiver should find the oldest page that has changed, and then update incrementally from there. A receiver **SHOULD** make use of HTTP's standard conditional request (`If-None-Match`/`If-Modified-Since`) mechanism to determine whether a page has been updated. For a detailed reference, see [MDN's article on HTTP conditional requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Conditional_requests).
 
