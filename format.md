@@ -171,6 +171,7 @@ All entities support the following attributes:
     If there are multiple descriptors available, the client is free to select the one that is the closest fit for its own display purposes (for example, selecting the most appropriate resolution or aspect ratio).
 
 * `summary`: A short description of the entity, intended to be one single line of plain text
+* `related`: A list of entities which should be seen as related to this entity (for example, associated artists). These **SHOULD** include a `relationship` label.
 * `relationship`: A brief explanation of how this entity is related to its containing entity
 
     For example:
@@ -207,8 +208,6 @@ All entities support the following attributes:
         * `license`: A full description of the license terms for the item
 
         Note that more link relationships may be added in the future as additional needs are identified; as such, a link with an unknown `rel` should be either ignored or collected as an "other" type.
-
-* `related`: A list of entities which should be seen as related to this entity (for example, associated artists). These **SHOULD** include a `relationship` label.
 
 ### <span id="entity-reference">Entity reference</span>
 
@@ -329,11 +328,11 @@ Both define three elements: an [`artist`](#artist) with a single [`album`](#albu
 In lyrics, the following Markdown-style markup types **MAY** be supported:
 
 * Emphasis (e.g. `*italic*`, `**bold**`)
-* Inline code (e.g. `` `i am a robot bleep blorp` ``)
+* Monospace text (e.g. `` `i am a robot bleep blorp` ``)
 
 It is valid for an implementation to display lyric text as the raw string.
 
-Raw HTML tags ***MUST NOT*** be supported; in contexts where the text display is being handled by an HTML renderer (such as in a browser or embedded WebView), entities **MUST** be encoded (for example, converting the text `<hello>` to the HTML `&lt;hello&gt;`).
+Raw HTML tags ***MUST NOT*** be supported; in contexts where the text display is being handled by an HTML renderer (such as in a browser or embedded WebView), entities **MUST** be escaped (for example, converting the text `<hello>` to the HTML `&lt;hello&gt;`).
 
 ### <span id="datetime">Dates and times</span>
 
@@ -498,7 +497,7 @@ It has the following additional properties:
 * `credits`: An array of detailed credits for the production of the track, containing the following properties:
 
     * `name`: The name of the person
-    * `role`: Their production role (e.g. vocals, instruments, production, coffee, etc.)
+    * `roles`: An array of production roles (e.g. vocals, instruments, production, coffee, etc.)
 
 * `media`: A list of descriptors providing streamable/listenable renditions of the track. This **SHOULD** contain at least one descriptor entity with a `contentType` of `audio/mp3` for maximum compatibility. Each descriptor contains the following properties:
 
@@ -509,7 +508,7 @@ It has the following additional properties:
 
     There can be multiple media with the same type, differentiated by `size` to indicate different quality levels/bitrates, so that player applications can choose the appropriate quality level based on bandwidth availability.
 
-    This is not suitable for different versions of a song, however; those should be given either with `related` or `links` as appropriate.
+    This is not suitable for different versions of a song, however; those should be given either with `related` or `links` as appropriate. That is to say, each of these **MUST** be the same underlying recording.
 
 An example track might look like:
 
@@ -581,95 +580,3 @@ An example track might look like:
     }]
 }
 ```
-
-### <span id="playlist">Playlist</span>
-
-==NOTE:== This section of the specification is especially rough and likely to change.
-
-A `playlist` is a curated list of music to listen to, including tracks and albums. This can be useful for an artist to publish a "best of" or a mixtape or the like. It has the following additional properties:
-
-* `author`: The author of the playlist
-
-The `$items` of this must include at least as much information as is necessary to recreate the entity assuming that this entity is the only data available. For example, for a `track` that is contained within the `collection`, only `$ref` is necessary, but for music stored in other collections it must contain the full metadata from the other collection.
-
-For example:
-
-```json
-{
-    "$type": "playlist",
-    "$id": "20a481cc-a340-4baf-8d89-d0973e3ec4cc",
-    "author": "Example Curator",
-    "$items": [{
-        "$type": "track",
-        "$id": "efd71467-3b9c-483c-a081-175f6a6f1a74",
-        "artist": {"name": "Example Band", "$id": "85eea5d9-8fc9-45e9-84c8-bb98a4885502"},
-        "name": "Hit Single",
-        "subtitle": "So tired",
-        "duration": 120,
-        "release": {"name": "Self-Titled Album", "$id": "72dd45e7-3192-4c63-8719-0e25043abf90"},
-        "url": "https://example.com/band/releases/hit-single.html",
-        "media": [{
-            "contentType": "audio/mp3",
-            "src": "https://cdn.example.com/artist/album/07 hit single.mp3",
-            "size": 2949120
-        }]
-    }, {
-        "$type": "track",
-        "$id": "1120a795-e51b-4666-b8f5-1904dd8b568f",
-        "artist": {"name": "Another band", "$id": "72d1a8ef-6396-4c7f-8758-f7d527368eab"},
-        "name": "A bigger fish to fry",
-        "url": "https://example.com/other-band/fish.html",
-        "media": [{
-            "contentType": "audio/mp3",
-            "src": "https://cdn.example.com/other-band/fish.mp3",
-            "size": 2949120
-        }]
-    }]
-}
-```
-
-As with [`release`](#release), the position in the `$items` list is what indicates the natural playback order of the song within the playlist; `trackNum` and `discNum`, if provided, are used only for display purposes.
-
-Valid `$items` types:
-
-* [`artist`](#artist)
-* [`release`](#release)
-* [`track`](#track)
-
-### <span id="events">Events</span>
-
-==NOTE:== This section of the specification is especially rough and likely to change.
-
-An `events` entity represents a time-based event feed to indicate interaction events. It is similar to a `playlist` but is meant to be ephemeral in nature.
-
-The intention is that an individual user could publish a Chorus collection containing an `events` entity as part of a greater recommendation system (with users subscribing to each others' feeds), and be similar to a "scrobbling" system such as [Last.fm](https://last.fm/), [Libre.fm](https://libre.fm/), or [ListenBrainz](https://listenbrainz.org/). However, its inclusion is only tentative and it is probably better for social elements to be in their own purpose-specific feed format that is expressed by e.g. ActivityPub, Atom, RSS, or similar.
-
-It provides the following properties:
-
-* `author`: The author/originator of the event list
-
-Valid `$items` types:
-
-* [`event`](#event)
-
-### <span id="event">Event</span>
-
-==NOTE:== This section of the specification is especially rough and likely to change.
-
-An `event` entity represents an individual interaction event. It contains the following properties:
-
-* `when`: When the item was added to the feed (i.e. when the event took place), as a [datetime](#datetime)
-* `rel`: What the listener did with the item; this can be one of the following:
-    * `play`: Indicates that this was an item played to completion
-    * `skip`: Indicates that this item was skipped over, possibly after being partially played
-    * `like`: Indicates that this item was enjoyed
-    * `dislike`: Indicates that this item was not enjoyed
-* `comment`: Any comment left by the listener, expressing textual sentiment (e.g. why they liked or disliked the item)
-
-Valid `$items` types:
-
-* [`label`](#label)
-* [`artist`](#artist)
-* [`release`](#release)
-* [`track`](#track)
-* [`playlist`](#playlist)
