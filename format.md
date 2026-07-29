@@ -286,7 +286,7 @@ For example, this document:
         "$type": "artist",
         "$id": "my-artist",
         "$items": [{
-            "$type": "album",
+            "$type": "release",
             "$id": "my-album",
             "$items": [{
                 "$type": "track",
@@ -309,7 +309,7 @@ is semantically-equivalent to this document:
             "$ref": "my-album"
         }]
     }, {
-        "$type": "album",
+        "$type": "release",
         "$id": "my-album",
         "$items": [{
             "$ref": "my-track"
