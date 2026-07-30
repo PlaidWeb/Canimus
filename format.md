@@ -347,11 +347,11 @@ A consumer **SHOULD** make use of all available precision, but it is not specifi
 
 Per the above, dates may be trivially sorted and filtered lexically, but fully-specified datetimes need to be timezone-aware.
 
-### <span id="duration">Durations</span> and <span id="timestamp">timestamps</span>
+### <span id="duration">Durations</span> and <span id="time-offset">time offsets</span>
 
-Durations and timestamps are given numerically as seconds, and **MUST** be serialized as a number. So, for example, a duration of 1 hour, 23 minutes, and 45.6 seconds is serialized as the number `5025.6`.
+Durations and time offsets are given numerically as seconds, and **MUST** be serialized as a number. So, for example, a duration of 1 hour, 23 minutes, and 45.6 seconds is serialized as the number `5025.6`.
 
-A timestamp is relative to the start time of the respective media.
+A time offset is relative to the start time of the respective media.
 
 ### <span id="url">URLs</span>
 
@@ -389,7 +389,6 @@ The `collection` entity can contain the following additional attributes:
 A collection supports the following additional link types, with the `rel` value set accordingly:
 
 * `websub`: A link to a [WebSub](https://en.wikipedia.org/wiki/WebSub) hub, where a receiver can subscribe to immediate updates to this collection
-* Links for pagination, as described in the [Pagination extension](extensions/pagination.md).
 
 All entity types are valid `$items` aside from `collection`.
 
@@ -463,8 +462,8 @@ It has the following additional properties:
 
 * `lyrics`: The human-readable, non-synchronized lyrics of the track, if any; this should be provided as plain text with a single `\n` between lines, and `\n\n` between verses. [Limited Markdown](#lyric-text) (such as `*emphasis*` and `**boldface**`) **MAY** be supported at the discretion of the consumer.
 * `synchronizedLyrics`: Synchronized lyrics, given as a list of items with the following properties:
-    * `startTime`: The starting [timestamp](#timestamp) of the lyric; **REQUIRED**
-    * `duration`: The [duration](#duration) of the lyric; **STRONGLY RECOMMENDED**
+    * `startTime`: The starting [time offset](#time-offset) of the lyric; **REQUIRED**
+    * `duration`: The [duration](#duration) of the lyric, in seconds; **STRONGLY RECOMMENDED**
 
         Note that lyrics may overlap (such as in the case of duets or staggered multi-part vocals), so if `duration` is not specified it must be inferred by the length of the text, *not* by the start time of the next lyric.
 
@@ -474,7 +473,7 @@ It has the following additional properties:
 * `genre`: An arbitrary string of text that may indicate vaguely what sorts of people might like this track (defaults to the containing `release`'s if unspecified)
 * `markers`: An array of marker items to indicate different sections of a track, such as movements, chapters, or other similar metadata. Each array item contains the following properties:
 
-    * `timestamp`: The time, in seconds, that the marker appears (relative to the start of the track); **REQUIRED**
+    * `startTime`: The [time offset](#time-offset) where the marker appears; **REQUIRED**
     * `text`: The text label of the marker; **REQUIRED**
     * `rel`: The type of marker, for example, `movement`, `section`, `chapter`, `index`, etc.
 
