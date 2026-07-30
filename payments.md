@@ -1,4 +1,4 @@
-# Federated payments
+# Decentralized payments
 
 Payments are the worst part of the streaming ecosystem and the area most subject to abuse. Global money pools that are split up on a per-stream basis encourage bot listeners and ultra-short content, and pooling payments across listeners means that disproportionate numbers of listens from single users will give an outsized influence on the payments sent to the artists they listen to, at the expense of other artists.
 
@@ -22,4 +22,4 @@ This strategy could also be used to allow for things like community support or a
 
 ## Implementation notes
 
-The recorded duration should be based on actual play time instead of the reported duration in the feed; this is to avoid things like feeds overreporting the length of the track, and allowing people to game the system by repeatedly listening to just a few seconds of a track. This also allows for prorating based on partial listens.
+The recorded duration should be based on actual play time instead of the reported duration in the collection; this is to avoid things like collections overreporting the length of the track, or allowing people to game the system by repeatedly listening to just a few seconds of a track. This also allows for prorating based on partial listens.
