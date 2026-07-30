@@ -8,6 +8,10 @@ For the sake of this specification, the assumption will be that the data is seri
 
 > The key words "**MUST**", "**MUST NOT**", "**REQUIRED**", "**SHALL**", "**SHALL NOT**", "**SHOULD**", "**SHOULD NOT**", "**RECOMMENDED**",  "**MAY**", and "**OPTIONAL**" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/info/rfc2119/).
 
+## <span id="version">Version</span>
+
+The current version of the Chorus specification is: `0.3.0`.
+
 ## Discovery
 
 In order for a Chorus document to be discoverable from a web resource, it **SHOULD** be advertised in the form of a relevant HTTP link.
@@ -377,7 +381,7 @@ The top-level entity **SHOULD** have a type of `collection`. A `collection` enti
 The `collection` entity can contain the following additional attributes:
 
 * `$protocol`: Refers to the protocol of the file, i.e. `"Chorus"`
-* `$version`: Refers to the base Chorus specification version in effect, e.g. "0.2.5"
+* `$version`: Refers to the base Chorus specification [version](#version) in effect
 * `$schema`: A URL to a JSON Schema reflective of the version of the protocol in use
 * `$deleted`: Items that have been previously published but are now removed from the collection, given as a list of `$id` values
 
