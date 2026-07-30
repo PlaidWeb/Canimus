@@ -6,15 +6,6 @@
         {
             "rel": "self",
             "href": "https://example.com/sample-collection.json"
-        },
-        {
-            "rel": "next",
-            "href": "https://example.com/sample-collection-2025.json",
-            "$comment": "The next page of updates, which took place in the year of 2025; it in turn links to sample-collection-2024.json, etc."
-        },
-        {
-            "rel": "full",
-            "href": "https://example.com/sample-collection-full.json"
         }
     ],
     "$deleted": [
