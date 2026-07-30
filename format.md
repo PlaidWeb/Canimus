@@ -102,7 +102,7 @@ For example, with the following strings:
 }
 ```
 
-a lookup of the attribute `summary` in locale `en-AU` will return `"Default"`.
+a lookup of the attribute `summary` in locale `en` or `en-AU` will return `"Default"`.
 
 Sample implementations for attribute lookup are as below.
 
@@ -180,7 +180,8 @@ All entities support the following attributes:
 
     If there are multiple descriptors available, the client is free to select the one that is the closest fit for its own display purposes (for example, selecting the most appropriate resolution or aspect ratio).
 
-* `summary`: A short description of the entity, intended to be one single line of plain text
+* `summary`: A short description of the entity, a single line of plain text
+* `description`: A detailed description of the entity, as [description text](#description-text)
 * `related`: A list of entities which should be seen as related to this entity (for example, associated artists). These **SHOULD** include a `relationship` label.
 * `relationship`: A brief explanation of how this entity is related to its containing entity
 
@@ -344,6 +345,24 @@ is semantically-equivalent to this document:
 ```
 
 Both define three elements: an [`artist`](#artist) with a single [`release`](#release) which contains a single [`track`](#track). The serialized structure is different, but the meaning is the same.
+
+### <span id="description-text">Description text</span>
+
+Detailed descriptions are given as HTML text, which is to be sanitized by the receiver.
+
+The recommended set of allowed tags is:
+
+* Headings; `<h1>`, `<h2>`, `<h3>`, `<h4>`
+* Paragraphs and line breaks; `<p>`, `<br>`
+* Links; `<a href>`
+* Lists; `<ul>`, `<ol>`, `<li>`
+* Dictionaries; `<dl>`, `<dt>`, `<dd>`
+* Emphasis; `<em>`, `<strong>`
+* Visual markup; `<b>`, `<i>`, `<sup>`, `<sub>`, `<tt>`
+* Quotations; `<blockquote cite>`
+* Miscellaneous; `<code>`
+
+It is allowed for a display client to limit the markup or presentation further, or to elide it entirely.
 
 ### <span id="lyric-text">Lyric Text</span>
 
