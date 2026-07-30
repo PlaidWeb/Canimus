@@ -199,7 +199,6 @@ All entities support the following attributes:
     * `href`: The [URL](#url) target of the link; **REQUIRED**
     * `contentType`: The content-type of the link (e.g. `text/html`, `application/rss+xml`, etc.)
     * `rel`: The relationship of this link to the item. These include, but are not limited to:
-        * `canonical`: The URL that is considered the canonical representation of this entity on the web
         * `this`: An alternate URL that is also trusted to represent this entity
         * `alternate`: A URL that represents an alternate version of this entity
         * `support`: Indicates that this URL is where a listener may provide financial support to the artist
