@@ -111,5 +111,3 @@ Listeners should be able to provide a profile of the music they are listening to
 * If part of a public playlist, the playlist URL
 
 This information could be used to build a per-player recommendation database, and possibly allow listeners to subscribe to each other as a form of peer-to-peer discovery and recommendation.
-
-In a "pure" implementation this could be provided as an [events feed](format.md#events) with optional [WebSub](https://en.wikipedia.org/wiki/WebSub) for push notifications, although this could also be reasonably implemented using ActivityPub or some other existing social fabric.
