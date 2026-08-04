@@ -211,8 +211,10 @@ All entities support the following attributes:
         * `genre`: Refers to a musical genre
         * `location`: Refers to the locality in which the entity was recorded or operates
         * `topic`: Refers to what the entity is about
+        * `instrument`: Refers to a featured instrument in the arrangemenet
+        * `mood`: A conscious state of mind or emotional state being conveyed
 
-        Note that more tag relationships may be added in the future as additional needs are identified; as such, a tag with an unknown `rel` should be either ignored or collected as an "other" type.
+        Note that more tag relationships may be added in the future as additional needs are identified, and may be defined arbitrarily by the publisher; as such, a tag with an unknown `rel` should be collected as an "other" type.
 
 
 * `links`: Associated links; stored as an array of property dictionaries, each of which includes the following attributes:
