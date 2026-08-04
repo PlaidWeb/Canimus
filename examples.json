@@ -39,6 +39,13 @@
                     "contentType": "image/jpeg"
                 }]
             },
+            "tags": [{
+                "name": "electropop",
+                "rel": "genre"
+            }, {
+                "name": "Anytown, USA",
+                "rel": "location"
+            }],
             "$items": [
                 {
                     "$type": "track",
@@ -47,6 +54,15 @@
                     "url": "https://example.band/track/hit-single",
                     "duration": 245,
                     "genre": "Rock",
+                    "tags": [
+                        {
+                            "name": "rock",
+                            "rel": "genre"
+                        }, {
+                            "name": "pop",
+                            "rel": "genre"
+                        }
+                    ],
                     "description": "This song was a hit single on the [Blibbored Top 50](https://example.com/blibboredtop50) for three hours in 2016",
                     "lyrics": "This is a song\nIt is not very long\nWould you *please* listen\nTo this silly song",
                     "synchronizedLyrics": [
@@ -98,6 +114,15 @@
                             "name$es": "Canción primera",
                             "url": "https://example.band/track/first-track",
                             "duration": 290.6,
+                            "tags": [
+                                {
+                                    "name": "rock",
+                                    "rel": "genre"
+                                }, {
+                                    "name": "Cancún, MX",
+                                    "rel": "location"
+                                }
+                            ],
                             "media": [
                                 {
                                     "contentType": "audio/mp3",
