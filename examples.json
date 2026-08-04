@@ -21,31 +21,39 @@
             "url": "https://example.band",
             "description": "The hit indie band from Exampletown, Idaho",
             "images": {
-                "main": [{
-                    "width": 960,
-                    "height": 1080,
-                    "src": "https://example.com/images/poster-960x1080.png",
-                    "contentType": "image/png"
-                }, {
-                    "width": 128,
-                    "height": 256,
-                    "src": "https://example.com/images/poster-128x256.jpg",
-                    "contentType": "image/jpeg"
-                }],
-                "thumb": [{
-                    "width": 1024,
-                    "height": 1024,
-                    "src": "https://example.com/images/headshot.jpg",
-                    "contentType": "image/jpeg"
-                }]
+                "main": [
+                    {
+                        "width": 960,
+                        "height": 1080,
+                        "src": "https://example.com/images/poster-960x1080.png",
+                        "contentType": "image/png"
+                    },
+                    {
+                        "width": 128,
+                        "height": 256,
+                        "src": "https://example.com/images/poster-128x256.jpg",
+                        "contentType": "image/jpeg"
+                    }
+                ],
+                "thumb": [
+                    {
+                        "width": 1024,
+                        "height": 1024,
+                        "src": "https://example.com/images/headshot.jpg",
+                        "contentType": "image/jpeg"
+                    }
+                ]
             },
-            "tags": [{
-                "name": "electropop",
-                "rel": "genre"
-            }, {
-                "name": "Anytown, USA",
-                "rel": "location"
-            }],
+            "tags": [
+                {
+                    "name": "electropop",
+                    "rel": "genre"
+                },
+                {
+                    "name": "Anytown, USA",
+                    "rel": "location"
+                }
+            ],
             "$items": [
                 {
                     "$type": "track",
@@ -58,7 +66,8 @@
                         {
                             "name": "rock",
                             "rel": "genre"
-                        }, {
+                        },
+                        {
                             "name": "pop",
                             "rel": "genre"
                         }
@@ -118,7 +127,8 @@
                                 {
                                     "name": "rock",
                                     "rel": "genre"
-                                }, {
+                                },
+                                {
                                     "name": "Cancún, MX",
                                     "rel": "location"
                                 }
