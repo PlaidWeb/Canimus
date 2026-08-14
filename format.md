@@ -204,6 +204,19 @@ All entities support the following attributes:
     }
     ```
 
+* `tags`: An array of items which contain descriptive tags for categorizing this entity, primarily to aid in content discovery and filtering. Each tag item has the following properties:
+
+    * `name`: The display name of the tag; **REQUIRED**
+    * `rel`: The relationship of the tag; tag relationships include, but are not limited to:
+        * `genre`: Refers to a musical genre
+        * `location`: Refers to the locality in which the entity was recorded or operates
+        * `topic`: Refers to what the entity is about
+        * `instrument`: Refers to a featured instrument in the arrangemenet
+        * `mood`: A conscious state of mind or emotional state being conveyed
+
+        Note that more tag relationships may be added in the future as additional needs are identified, and may be defined arbitrarily by the publisher; as such, a tag with an unknown `rel` should be collected as an "other" type.
+
+
 * `links`: Associated links; stored as an array of property dictionaries, each of which includes the following attributes:
     * `name`: The display name of the link; **REQUIRED**
     * `href`: The [URL](#url) target of the link; **REQUIRED**
@@ -431,7 +444,12 @@ An entity of type `release` indicates a released item, typically an album contai
 * `copyright`: The base copyright information of the release (e.g. `"℗2025 MecaGorp Ultd; ©2025 Jennifer Example"`)
 * `license`: Additional license information, e.g. `"CC by-nc-sa"`
 * `licenseUrl`: A link to the additional license information, e.g. `"https://creativecommons.org/licenses/by-nc-sa/4.0/"`
-* `genre`: An arbitrary string of text that may indicate vaguely what sorts of people might like this release
+* `genre`: An arbitrary descriptive string of plain text that may indicate vaguely what sorts of people might like this release.
+
+    Note that this is for end-user display purposes, and not for categorization and content filtering; that should be performed using the entity's `tags` properties. Both attributes serve different purposes.
+
+    If no `genre` is specified, then a user-facing client **MAY** form a display string from the entity's `tags` with a `rel` of `genre`.
+
 * `featuring`: An array of additional featured [`artist`](#artist)s, to indicate collaborations; these artists may also have additional properties such as:
     * `role`: The role this artist played in the release
 
@@ -479,7 +497,10 @@ It has the following additional properties:
     * `voice`: The name of the voice that is singing/stating the lyric; if provided, this **SHOULD** be human-readable, and **MUST** be consistent throughout the track
     * `text`: The representative text of the lyric, in [limited Markdown](#lyric-text); **REQUIRED**
 
-* `genre`: An arbitrary string of text that may indicate vaguely what sorts of people might like this track (defaults to the containing `release`'s if unspecified)
+* `genre`: An arbitrary descriptive string of plain text that may indicate vaguely what sorts of people might like this track (defaults to the containing `release`'s if unspecified).
+
+    If no `genre` is specified, then a user-facing client **MAY** form a display string from the entity's `tags` with a `rel` of `genre`.
+
 * `markers`: An array of marker items to indicate different sections of a track, such as movements, chapters, or other similar metadata. Each array item contains the following properties:
 
     * `startTime`: The [time offset](#time-offset) where the marker appears; **REQUIRED**
