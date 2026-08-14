@@ -353,7 +353,10 @@ Detailed descriptions are given as HTML text, which is to be sanitized by the re
 The recommended set of allowed tags is:
 
 * Headings; `<h1>`, `<h2>`, `<h3>`, `<h4>`
-* Paragraphs and line breaks; `<p>`, `<br>` (<a href="#br-note">see note</a>)
+* Paragraphs and line breaks; `<p>`, `<br>`
+
+    <mark>Note:</mark> As this text is specified as HTML, clients **MUST** support `<br>` as a self-closing tag; they **SHOULD** also support the XHTML version (`<br/>`).
+
 * Links; `<a href>`
 * Lists; `<ul>`, `<ol>`, `<li>`
 * Dictionaries; `<dl>`, `<dt>`, `<dd>`
@@ -365,8 +368,6 @@ The recommended set of allowed tags is:
 It is allowed for a display client to limit the markup or presentation further, or to elide it entirely.
 
 It is **SUGGESTED** that there be a reasonable length limit imposed by the client; in the event that such a limit is exceeded, the client **MUST** properly close any open tags as part of its sanitization process.
-
-<mark id="br-note">Note:</mark> As this text is specified as HTML, clients **MUST** support `<br>` as a self-closing tag; they **SHOULD** also support the XHTML version (`<br/>`).
 
 ### <span id="lyric-text">Lyric Text</span>
 
