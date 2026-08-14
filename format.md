@@ -359,7 +359,9 @@ The recommended set of allowed HTML tags and attributes is:
 
 * Links; `<a href>`
 
-    Link `href` **MUST** be sanitized to remove anything other than a valid URL; in particular, JavaScript **MUST NOT** be permitted. It is also **RECOMMENDED** that any link activation not disrupt the operation of the client itself; for example, from an app-based client, this **SHOULD** open a separate WebView or browser, and from a web-based client, this **SHOULD** open the link in a new tab or window (with e.g. `target="_blank"`)
+    The `href` **MUST** be sanitized to remove anything other than a valid URL; in particular, JavaScript **MUST NOT** be permitted. It is also **RECOMMENDED** that any link activation not disrupt the operation of the client itself; for example, from an app-based client, this **SHOULD** open a separate WebView or browser, and from a web-based client, this **SHOULD** open the link in a new tab or window (with e.g. `target="_blank"`)
+
+    A relative `href` **MUST** be interpreted as relative to the Chorus document's URL.
 
 * Lists; `<ul>`, `<ol>`, `<li>`
 * Dictionaries; `<dl>`, `<dt>`, `<dd>`
