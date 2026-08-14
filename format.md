@@ -358,9 +358,9 @@ The recommended set of allowed tags is:
 * Lists; `<ul>`, `<ol>`, `<li>`
 * Dictionaries; `<dl>`, `<dt>`, `<dd>`
 * Emphasis; `<em>`, `<strong>`
-* Visual markup; `<b>`, `<i>`, `<sup>`, `<sub>`, `<tt>`
+* Visual markup; `<b>`, `<i>`, `<sup>`, `<sub>`, `<tt>`, `<mark>`
 * Quotations; `<blockquote cite>`
-* Miscellaneous; `<code>`
+* Miscellaneous; `<code>`, `<cite>`
 
 It is allowed for a display client to limit the markup or presentation further, or to elide it entirely.
 

@@ -72,7 +72,7 @@
                             "rel": "genre"
                         }
                     ],
-                    "description": "This song was a hit single on the [Blibbored Top 50](https://example.com/blibboredtop50) for three hours in 2016",
+                    "description": "This song was a hit single on the <a href=\"https://example.com/blibboredtop50\">Blibbored Top 50</a> for three hours in 2016",
                     "lyrics": "This is a song\nIt is not very long\nWould you *please* listen\nTo this silly song",
                     "synchronizedLyrics": [
                         {
