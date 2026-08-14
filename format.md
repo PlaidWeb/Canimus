@@ -350,14 +350,17 @@ Both define three elements: an [`artist`](#artist) with a single [`release`](#re
 
 Detailed descriptions are given as HTML text, which is to be sanitized by the receiver.
 
-The recommended set of allowed tags is:
+The recommended set of allowed HTML tags and attributes is:
 
-* Headings; `<h1>`, `<h2>`, `<h3>`, `<h4>`
+* Headings; `<h1>`, `<h2>`, `<h3>`, `<h4>`, `<h5>`, `<h6>`, `<hgroup>`
 * Paragraphs and line breaks; `<p>`, `<br>`
 
-    <mark>Note:</mark> As this text is specified as HTML, clients **MUST** support `<br>` as a self-closing tag; they **SHOULD** also support the XHTML version (`<br/>`).
+    As this text is specified as HTML, clients **MUST** support `<br>` as a self-closing tag; they **SHOULD** also support the XHTML version (`<br/>`).
 
 * Links; `<a href>`
+
+    Link `href` **MUST** be sanitized to remove anything other than a valid URL; in particular, JavaScript **MUST NOT** be permitted. It is also **RECOMMENDED** that any link activation not disrupt the operation of the client itself; for example, from an app-based client, this **SHOULD** open a separate WebView or browser, and from a web-based client, this **SHOULD** open the link in a new tab or window (with e.g. `target="_blank"`)
+
 * Lists; `<ul>`, `<ol>`, `<li>`
 * Dictionaries; `<dl>`, `<dt>`, `<dd>`
 * Emphasis; `<em>`, `<strong>`
