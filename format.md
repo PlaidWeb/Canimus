@@ -102,7 +102,7 @@ For example, with the following strings:
 }
 ```
 
-a lookup of the attribute `summary` in locale `en-AU` will return `"Default"`.
+a lookup of the attribute `summary` in locale `en` or `en-AU` will return `"Default"`.
 
 Sample implementations for attribute lookup are as below.
 
@@ -180,7 +180,8 @@ All entities support the following attributes:
 
     If there are multiple descriptors available, the client is free to select the one that is the closest fit for its own display purposes (for example, selecting the most appropriate resolution or aspect ratio).
 
-* `summary`: A short description of the entity, intended to be one single line of plain text
+* `summary`: A short description of the entity, a single line of plain text
+* `description`: A detailed description of the entity, as [description text](#description-text)
 * `related`: A list of entities which should be seen as related to this entity (for example, associated artists). These **SHOULD** include a `relationship` label.
 * `relationship`: A brief explanation of how this entity is related to its containing entity
 
@@ -343,6 +344,34 @@ is semantically-equivalent to this document:
 ```
 
 Both define three elements: an [`artist`](#artist) with a single [`release`](#release) which contains a single [`track`](#track). The serialized structure is different, but the meaning is the same.
+
+### <span id="description-text">Description text</span>
+
+Detailed descriptions are given as HTML text, which is to be sanitized by the receiver.
+
+The recommended set of allowed HTML tags and attributes is:
+
+* Headings; `<h1>`, `<h2>`, `<h3>`, `<h4>`, `<h5>`, `<h6>`, `<hgroup>`
+* Paragraphs and line breaks; `<p>`, `<br>`
+
+    As this text is specified as HTML, clients **MUST** support `<br>` as a self-closing tag; they **SHOULD** also support the XHTML version (`<br/>`).
+
+* Links; `<a href>`
+
+    The `href` **MUST** be sanitized to remove anything other than a valid URL; in particular, JavaScript **MUST NOT** be permitted. It is also **RECOMMENDED** that any link activation not disrupt the operation of the client itself; for example, from an app-based client, this **SHOULD** open a separate WebView or browser, and from a web-based client, this **SHOULD** open the link in a new tab or window (with e.g. `target="_blank"`)
+
+    A relative `href` **MUST** be interpreted as relative to the Chorus document's URL.
+
+* Lists; `<ul>`, `<ol>`, `<li>`
+* Dictionaries; `<dl>`, `<dt>`, `<dd>`
+* Emphasis; `<em>`, `<strong>`
+* Visual markup; `<b>`, `<i>`, `<sup>`, `<sub>`, `<tt>`, `<s>`
+* Quotations; `<blockquote cite>`
+* Miscellaneous annotations; `<code>`, `<cite>`, `<mark>`, `<del>`, `<ins>`
+
+It is allowed for a display client to limit the markup or presentation further, or to elide it entirely.
+
+It is **SUGGESTED** that there be a reasonable length limit imposed by the client; in the event that such a limit is exceeded, the client **MUST** properly close any open tags as part of its sanitization process.
 
 ### <span id="lyric-text">Lyric Text</span>
 
