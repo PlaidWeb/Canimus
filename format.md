@@ -10,7 +10,7 @@ For the sake of this specification, the assumption will be that the data is seri
 
 ## <span id="version">Version</span>
 
-The current version of the Chorus specification is [`0.3.1`](https://github.com/PlaidWeb/Chorus/releases/tag/v0.3.1).
+The current version of the Chorus specification is [`0.3.2`](https://github.com/PlaidWeb/Chorus/releases/tag/v0.3.2).
 
 The version number follows the principles of [semantic versioning](https://semver.org/), namely, given a version number of `MAJOR.MINOR.PATCH`,
 
