@@ -227,7 +227,6 @@ All entities support the following attributes:
         * `support`: Indicates that this URL is where a listener may provide financial support to the artist
         * `purchase`: Indicates that this URL is where a listener may obtain a copy of this content
         * `video`: A place to see a music video for this content
-        * `license`: A full description of the license terms for the item
 
         Note that more link relationships may be added in the future as additional needs are identified; as such, a link with an unknown `rel` should be either ignored or collected as an "other" type.
 
