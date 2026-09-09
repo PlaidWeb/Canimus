@@ -2,6 +2,8 @@
 
 Chorus is a lightweight syndication format for federated music discovery and streaming in a platform- and distribution-agnostic manner.
 
+Read more about it at the [official website](https://mecagorp.com/chorus/).
+
 ## Rationale
 
 Music discovery, consumption, and streaming are locked down by large corporations that have made a mess of things. The streaming providers have to cater to the whims of the major record labels, and have created a two-tier system where neither discovery nor payments are even remotely fair. Independent musicians are hit hardes by this, as they have to pay money to play a game that is stacked against them, and what little listenership they get is largely divvied up to the major labels. The specific payment strategy that's used has also led to a glut of minimum-effort content and AI slop and bot-driven streaming that tries to game the system, hurting everyone, big and small alike.
